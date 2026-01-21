@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'flash_card.dart';
+import 'Set.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,10 +22,7 @@ class MyApp extends StatelessWidget {
             fontSize: 72,
             fontWeight: FontWeight.bold,
           ),
-          titleLarge: GoogleFonts.oswald(
-            fontSize: 30,
-            fontStyle: FontStyle.italic,
-          ),
+          titleLarge: GoogleFonts.oswald(fontSize: 30),
           bodyMedium: GoogleFonts.merriweather(),
           displaySmall: GoogleFonts.pacifico(),
         ),
@@ -107,9 +106,10 @@ class BottomNavBar extends StatefulWidget {
 class BottomNavBarState extends State<BottomNavBar> {
   int selectedIndex = 0;
 
-  static const List<Widget> widgetOptions = <Widget>[
+  List<Widget> widgetOptions = <Widget>[
     HomeScreen(),
     SetsScreen(),
+    CreateSetScreen(),
     ProfileScreen(),
   ];
 
@@ -126,8 +126,13 @@ class BottomNavBarState extends State<BottomNavBar> {
       body: Center(child: widgetOptions.elementAt(selectedIndex)),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: "Home",
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.book), label: "Sets"),
+          BottomNavigationBarItem(icon: Icon(Icons.add), label: "Create Set"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
         currentIndex: selectedIndex,
@@ -137,12 +142,83 @@ class BottomNavBarState extends State<BottomNavBar> {
   }
 }
 
-class SetsScreen extends StatelessWidget {
+// Sample data: multiple FlashCard instances
+// final List<FlashCard> sampleCards = [
+//   FlashCard(
+//     id: '1',
+//     question: 'What is Flutter?',
+//     answer: 'A UI toolkit by Google',
+//   ),
+//   FlashCard(id: '2', question: 'What language is used?', answer: 'Dart'),
+//   FlashCard(
+//     id: '3',
+//     question: 'Stateful or Stateless?',
+//     answer: 'Both, depending on widget',
+//   ),
+// ];
+
+// final List<Set> sampleSets = [
+//   Set(
+//     id: '1',
+//     name: 'Vocabulary',
+//     description: 'Biology terms',
+//     flashCards: sampleCards,
+//   ),
+// ];
+
+class SetsScreen extends StatefulWidget {
   const SetsScreen({super.key});
+
+  @override
+  State<SetsScreen> createState() => _SetsScreenState();
+}
+
+class _SetsScreenState extends State<SetsScreen> {
+  int numberOfSets = 0;
+  List<Set> sets = [];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Sets')),
+      body: Column(
+        children: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              setState(() {
+                numberOfSets++;
+                sets.add(
+                  Set(
+                    id: numberOfSets.toString(),
+                    name: '',
+                    description: '',
+                    flashCards: new List<FlashCard>.empty(growable: true),
+                  ),
+                );
+              });
+            },
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: sets.length,
+              itemBuilder: (context, index) {
+                return SetWidget(set: sets[index]);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CreateSetScreen extends StatelessWidget {
+  const CreateSetScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return const Text(
-      'SetsScreen',
+      'Create Set Screen',
       style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
     );
   }
