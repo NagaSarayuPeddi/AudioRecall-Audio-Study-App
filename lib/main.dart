@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'flash_card.dart';
-import 'Set.dart';
+import 'study_set.dart';
 
 void main() {
   runApp(const MyApp());
@@ -175,7 +175,7 @@ class SetsScreen extends StatefulWidget {
 
 class _SetsScreenState extends State<SetsScreen> {
   int numberOfSets = 0;
-  List<Set> sets = [];
+  List<StudySet> sets = [];
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +189,7 @@ class _SetsScreenState extends State<SetsScreen> {
               setState(() {
                 numberOfSets++;
                 sets.add(
-                  Set(
+                  StudySet(
                     id: numberOfSets.toString(),
                     name: '',
                     description: '',
@@ -203,7 +203,15 @@ class _SetsScreenState extends State<SetsScreen> {
             child: ListView.builder(
               itemCount: sets.length,
               itemBuilder: (context, index) {
-                return SetWidget(set: sets[index]);
+                return SetWidget(
+                  key: ValueKey(sets[index].id),
+                  set: sets[index],
+                  onDelete: (setToDelete) {
+                    setState(() {
+                      sets.removeWhere((set_) => set_.id == setToDelete.id);
+                    });
+                  },
+                );
               },
             ),
           ),
