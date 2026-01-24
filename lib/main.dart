@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Audio Study App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 157, 36, 179)),
         textTheme: TextTheme(
           displayLarge: const TextStyle(
             fontSize: 72,
@@ -43,7 +43,7 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      backgroundColor: const Color.fromARGB(255, 249, 147, 191),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Center(
@@ -73,20 +73,18 @@ class HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(width: 40, height: 40),
               ElevatedButton(
-                onPressed: null,
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.inversePrimary, // Background color
+                  backgroundColor: const Color.fromARGB(255, 230, 216, 91),// Background color
                   foregroundColor: Colors.white, // Text/icon color
                   shadowColor: Colors.black, // Shadow color
                   elevation: 10.0,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 30,
-                    vertical: 50,
+                    horizontal: 40,
+                    vertical: 60,
                   ),
                 ),
-                child: Text("Create New Set", style: TextStyle(fontSize: 30)),
+                child: Text("Create New Set", style: TextStyle(fontSize: 50)),
               ),
             ],
           ),
