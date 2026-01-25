@@ -50,6 +50,24 @@ class CardPageState extends State<CardPage> {
               });
             },
           ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: widget.cardSet.flashCards.length,
+              itemBuilder: (context, index) {
+                return FlashCardWidget(
+                  onDeleteCard: (flashCard) {
+                    setState(() {
+                      widget.cardSet.flashCards.removeWhere(
+                        (card) => card.id == flashCard.id,
+                      );
+                    });
+                  },
+                  flashCard: widget.cardSet.flashCards[index],
+                  key: ValueKey(widget.cardSet.flashCards[index].id),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );

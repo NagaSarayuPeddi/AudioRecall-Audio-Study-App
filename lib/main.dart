@@ -16,7 +16,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Audio Study App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 157, 36, 179)),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 157, 36, 179),
+        ),
         textTheme: TextTheme(
           displayLarge: const TextStyle(
             fontSize: 72,
@@ -75,7 +77,12 @@ class HomeScreenState extends State<HomeScreen> {
               ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 230, 216, 91),// Background color
+                  backgroundColor: const Color.fromARGB(
+                    255,
+                    230,
+                    216,
+                    91,
+                  ), // Background color
                   foregroundColor: Colors.white, // Text/icon color
                   shadowColor: Colors.black, // Shadow color
                   elevation: 10.0,
@@ -107,7 +114,6 @@ class BottomNavBarState extends State<BottomNavBar> {
   List<Widget> widgetOptions = <Widget>[
     HomeScreen(),
     SetsScreen(),
-    CreateSetScreen(),
     ProfileScreen(),
   ];
 
@@ -130,7 +136,6 @@ class BottomNavBarState extends State<BottomNavBar> {
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
           BottomNavigationBarItem(icon: Icon(Icons.book), label: "Sets"),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: "Create Set"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
         currentIndex: selectedIndex,
@@ -219,16 +224,16 @@ class _SetsScreenState extends State<SetsScreen> {
   }
 }
 
-class CreateSetScreen extends StatelessWidget {
-  const CreateSetScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return const Text(
-      'Create Set Screen',
-      style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-    );
-  }
-}
+// class CreateSetScreen extends StatelessWidget {
+//   const CreateSetScreen({super.key});
+//   @override
+//   Widget build(BuildContext context) {
+//     return const Text(
+//       'Create Set Screen',
+//       style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+//     );
+//   }
+// }
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});

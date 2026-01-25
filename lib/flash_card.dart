@@ -9,9 +9,21 @@ class FlashCard {
   FlashCard({required this.id, required this.question, required this.answer});
 }
 
-class FlashCardWidget extends StatelessWidget {
-  const FlashCardWidget({super.key});
+class FlashCardWidget extends StatefulWidget {
+  final FlashCard flashCard;
+  final void Function(FlashCard flashCard)? onDeleteCard;
 
+  const FlashCardWidget({
+    super.key,
+    required this.flashCard,
+    this.onDeleteCard,
+  });
+
+  @override
+  State<FlashCardWidget> createState() => _FlashCardWidgetState();
+}
+
+class _FlashCardWidgetState extends State<FlashCardWidget> {
   @override
   Widget build(BuildContext context) {
     return Card(
