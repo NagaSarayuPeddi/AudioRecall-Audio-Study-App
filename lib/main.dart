@@ -35,7 +35,9 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final VoidCallback onCreateSetButtonPressed;
+
+  const HomeScreen({super.key, required this.onCreateSetButtonPressed});
 
   @override
   State<HomeScreen> createState() => HomeScreenState();
@@ -75,14 +77,7 @@ class HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(width: 40, height: 40),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SetsScreen(sets: []),
-                    ),
-                  );
-                },
+                onPressed: widget.onCreateSetButtonPressed,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(
                     255,
@@ -120,7 +115,7 @@ class BottomNavBarState extends State<BottomNavBar> {
   final List<StudySet> finalSets = [];
 
   late List<Widget> widgetOptions = <Widget>[
-    HomeScreen(),
+    HomeScreen(onCreateSetButtonPressed: () => onIconPressed(1)),
     SetsScreen(sets: finalSets),
     ProfileScreen(),
   ];
