@@ -75,7 +75,14 @@ class HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(width: 40, height: 40),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SetsScreen(sets: []),
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(
                     255,
