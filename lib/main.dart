@@ -110,10 +110,11 @@ class BottomNavBar extends StatefulWidget {
 
 class BottomNavBarState extends State<BottomNavBar> {
   int selectedIndex = 0;
+  final List<StudySet> finalSets = [];
 
-  List<Widget> widgetOptions = <Widget>[
+  late List<Widget> widgetOptions = <Widget>[
     HomeScreen(),
-    SetsScreen(),
+    SetsScreen(sets: finalSets),
     ProfileScreen(),
   ];
 
@@ -170,7 +171,9 @@ class BottomNavBarState extends State<BottomNavBar> {
 // ];
 
 class SetsScreen extends StatefulWidget {
-  const SetsScreen({super.key});
+  final List<StudySet> sets;
+
+  const SetsScreen({super.key, required this.sets});
 
   @override
   State<SetsScreen> createState() => _SetsScreenState();
@@ -178,7 +181,7 @@ class SetsScreen extends StatefulWidget {
 
 class _SetsScreenState extends State<SetsScreen> {
   int numberOfSets = 0;
-  List<StudySet> sets = [];
+  // List<StudySet> sets = [];
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +194,7 @@ class _SetsScreenState extends State<SetsScreen> {
             onPressed: () {
               setState(() {
                 numberOfSets++;
-                sets.add(
+                widget.sets.add(
                   StudySet(
                     id: numberOfSets.toString(),
                     name: '',
@@ -204,14 +207,16 @@ class _SetsScreenState extends State<SetsScreen> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: sets.length,
+              itemCount: widget.sets.length,
               itemBuilder: (context, index) {
                 return SetWidget(
-                  key: ValueKey(sets[index].id),
-                  set: sets[index],
+                  key: ValueKey(widget.sets[index].id),
+                  set: widget.sets[index],
                   onDelete: (setToDelete) {
                     setState(() {
-                      sets.removeWhere((set_) => set_.id == setToDelete.id);
+                      widget.sets.removeWhere(
+                        (set_) => set_.id == setToDelete.id,
+                      );
                     });
                   },
                 );
