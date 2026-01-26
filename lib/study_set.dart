@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'flash_card.dart';
 import 'cards_page.dart';
 import 'services/stt_service.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 class StudySet {
   final String id;
@@ -37,6 +38,8 @@ class _SetWidgetState extends State<SetWidget> {
   final stt = STTService();
   bool isListeningDescription = false;
   bool isListeningName = false;
+
+  final FlutterTts tts = FlutterTts();
 
   void donePressed() {
     setState(() {
@@ -109,7 +112,9 @@ class _SetWidgetState extends State<SetWidget> {
                         //   );
                         //   return;
                         // }
-
+                        await tts.speak(
+                          "Microphone activated. Start speaking the set name.",
+                        );
                         // Start listening
                         setState(() => isListeningName = true);
                         stt.startListening((text) {
@@ -119,6 +124,7 @@ class _SetWidgetState extends State<SetWidget> {
                         });
                       } else {
                         // Stop listening
+                        await tts.speak("Microphone deactivated.");
                         stt.stopListening();
                         setState(() => isListeningName = false);
                       }
@@ -193,6 +199,10 @@ class _SetWidgetState extends State<SetWidget> {
                           return;
                         }
 
+                        await tts.speak(
+                          "Microphone activated. Start speaking the description.",
+                        );
+
                         // Start listening
                         setState(() => isListeningDescription = true);
                         stt.startListening((text) {
@@ -201,6 +211,7 @@ class _SetWidgetState extends State<SetWidget> {
                           });
                         });
                       } else {
+                        await tts.speak("Microphone deactivated.");
                         // Stop listening
                         stt.stopListening();
                         setState(() => isListeningDescription = false);

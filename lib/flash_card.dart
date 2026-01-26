@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 //import 'package:google_fonts/google_fonts.dart';
 import 'services/stt_service.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 class FlashCard {
   final String id;
@@ -37,6 +38,8 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
   final stt = STTService();
   bool isListeningAnswer = false;
   bool isListeningQuestion = false;
+
+  final FlutterTts tts = FlutterTts();
 
   @override
   void initState() {
@@ -87,7 +90,9 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                         print("Microphone not available or permission denied");
                         return;
                       }
-
+                      await tts.speak(
+                        "Microphone activated. Start speaking the question.",
+                      );
                       // Start listening
                       setState(() => isListeningQuestion = true);
                       stt.startListening((text) {
@@ -96,6 +101,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                         });
                       });
                     } else {
+                      await tts.speak("Microphone deactivated.");
                       // Stop listening
                       stt.stopListening();
                       setState(() => isListeningQuestion = false);
@@ -143,6 +149,10 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                         return;
                       }
 
+                      await tts.speak(
+                        "Microphone activated. Start speaking the answer.",
+                      );
+
                       // Start listening
                       setState(() => isListeningAnswer = true);
                       stt.startListening((text) {
@@ -151,6 +161,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                         });
                       });
                     } else {
+                      await tts.speak("Microphone deactivated.");
                       // Stop listening
                       stt.stopListening();
                       setState(() => isListeningAnswer = false);
