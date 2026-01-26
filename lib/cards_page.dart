@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+//import 'package:google_fonts/google_fonts.dart';
 import 'flash_card.dart';
 import 'study_set.dart';
 
@@ -29,10 +29,7 @@ class CardPageState extends State<CardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.cardSet.name, style: GoogleFonts.oswald()),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text(widget.cardSet.name), centerTitle: true),
       body: Column(
         children: [
           IconButton(

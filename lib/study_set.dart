@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+//import 'package:google_fonts/google_fonts.dart';
 import 'flash_card.dart';
 import 'cards_page.dart';
+import 'services/stt_service.dart';
 
 class StudySet {
   final String id;
@@ -33,6 +34,9 @@ class _SetWidgetState extends State<SetWidget> {
   TextEditingController? nameController;
   TextEditingController? descriptionController;
 
+  final stt = STTService();
+  bool isListening = false;
+
   void donePressed() {
     setState(() {
       widget.set.isEditing = false;
@@ -50,6 +54,8 @@ class _SetWidgetState extends State<SetWidget> {
     super.initState();
     nameController = TextEditingController(text: widget.set.name);
     descriptionController = TextEditingController(text: widget.set.description);
+
+    stt.initialize();
   }
 
   @override
@@ -91,17 +97,129 @@ class _SetWidgetState extends State<SetWidget> {
                       ),
                     ),
                   ),
+                  GestureDetector(
+                    onTap: () async {
+                      if (!isListening) {
+                        // Initialize speech-to-text first
+                        bool available = await stt.initialize();
+                        if (!available) {
+                          print(
+                            "Microphone not available or permission denied",
+                          );
+                          return;
+                        }
+
+                        // Start listening
+                        setState(() => isListening = true);
+                        stt.startListening((text) {
+                          setState(() {
+                            nameController!.text = text;
+                          });
+                        });
+                      } else {
+                        // Stop listening
+                        stt.stopListening();
+                        setState(() => isListening = false);
+                      }
+                    },
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: Colors.purple,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        isListening ? Icons.mic : Icons.mic_none,
+                        color: Colors.white,
+                        size: 50,
+                      ),
+                    ),
+                    // child: IconButton(
+                    //   icon: Icon(isListening ? Icons.mic : Icons.mic_none),
+                    // onPressed: () async {
+                    //   if (!isListening) {
+                    //     // Initialize speech-to-text first
+                    //     bool available = await stt.initialize();
+                    //     if (!available) {
+                    //       print(
+                    //         "Microphone not available or permission denied",
+                    //       );
+                    //       return;
+                    //     }
+
+                    //     // Start listening
+                    //     setState(() => isListening = true);
+                    //     stt.startListening((text) {
+                    //       setState(() {
+                    //         nameController!.text = text;
+                    //       });
+                    //     });
+                    //   } else {
+                    //     // Stop listening
+                    //     stt.stopListening();
+                    //     setState(() => isListening = false);
+                    //   }
+                    // },
+                    //),
+                  ),
                 ],
               ),
               const SizedBox(height: 10),
-              TextField(
-                enabled: widget.set.isEditing,
-                controller: descriptionController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter description',
-                  labelText: 'Decription',
-                ),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      enabled: widget.set.isEditing,
+                      controller: descriptionController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter description',
+                        labelText: 'Decription',
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      if (!isListening) {
+                        // Initialize speech-to-text first
+                        bool available = await stt.initialize();
+                        if (!available) {
+                          print(
+                            "Microphone not available or permission denied",
+                          );
+                          return;
+                        }
+
+                        // Start listening
+                        setState(() => isListening = true);
+                        stt.startListening((text) {
+                          setState(() {
+                            descriptionController!.text = text;
+                          });
+                        });
+                      } else {
+                        // Stop listening
+                        stt.stopListening();
+                        setState(() => isListening = false);
+                      }
+                    },
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: Colors.purple,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        isListening ? Icons.mic : Icons.mic_none,
+                        color: Colors.white,
+                        size: 50,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 10),
               if (widget.set.isEditing)

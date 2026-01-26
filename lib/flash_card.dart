@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+//import 'package:google_fonts/google_fonts.dart';
+import 'services/stt_service.dart';
 
 class FlashCard {
   final String id;
@@ -32,6 +33,9 @@ class FlashCardWidget extends StatefulWidget {
 class _FlashCardWidgetState extends State<FlashCardWidget> {
   TextEditingController? questionController;
   TextEditingController? answerController;
+
+  final stt = STTService();
+  bool isListening = false;
 
   @override
   void initState() {
@@ -73,6 +77,43 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                     ),
                   ),
                 ),
+                GestureDetector(
+                  onTap: () async {
+                    if (!isListening) {
+                      // Initialize speech-to-text first
+                      bool available = await stt.initialize();
+                      if (!available) {
+                        print("Microphone not available or permission denied");
+                        return;
+                      }
+
+                      // Start listening
+                      setState(() => isListening = true);
+                      stt.startListening((text) {
+                        setState(() {
+                          questionController!.text = text;
+                        });
+                      });
+                    } else {
+                      // Stop listening
+                      stt.stopListening();
+                      setState(() => isListening = false);
+                    }
+                  },
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.purple,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isListening ? Icons.mic : Icons.mic_none,
+                      color: Colors.white,
+                      size: 50,
+                    ),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 15),
@@ -88,6 +129,43 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                       border: OutlineInputBorder(),
                       hintText: 'Enter the answer',
                       labelText: 'Answer',
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    if (!isListening) {
+                      // Initialize speech-to-text first
+                      bool available = await stt.initialize();
+                      if (!available) {
+                        print("Microphone not available or permission denied");
+                        return;
+                      }
+
+                      // Start listening
+                      setState(() => isListening = true);
+                      stt.startListening((text) {
+                        setState(() {
+                          answerController!.text = text;
+                        });
+                      });
+                    } else {
+                      // Stop listening
+                      stt.stopListening();
+                      setState(() => isListening = false);
+                    }
+                  },
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.purple,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isListening ? Icons.mic : Icons.mic_none,
+                      color: Colors.white,
+                      size: 50,
                     ),
                   ),
                 ),

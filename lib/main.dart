@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'flash_card.dart';
 import 'study_set.dart';
+import 'services/stt_service.dart';
 
 void main() {
+  //GoogleFonts.config.allowRuntimeFetching = false;
   runApp(const MyApp());
 }
 
@@ -25,7 +27,7 @@ class MyApp extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
           titleLarge: GoogleFonts.oswald(fontSize: 30),
-          bodyMedium: GoogleFonts.merriweather(),
+          bodyMedium: GoogleFonts.poppins(),
           displaySmall: GoogleFonts.pacifico(),
         ),
       ),
@@ -79,7 +81,12 @@ class HomeScreenState extends State<HomeScreen> {
               ElevatedButton(
                 onPressed: widget.onCreateSetButtonPressed,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 76, 175, 80),// Background color
+                  backgroundColor: const Color.fromARGB(
+                    255,
+                    76,
+                    175,
+                    80,
+                  ), // Background color
                   foregroundColor: Colors.white, // Text/icon color
                   shadowColor: Colors.black, // Shadow color
                   elevation: 10.0,
