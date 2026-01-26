@@ -16,7 +16,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Audio Study App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 0, 150, 136)),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 157, 36, 179),
+        ),
         textTheme: TextTheme(
           displayLarge: const TextStyle(
             fontSize: 72,
@@ -33,7 +35,9 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final VoidCallback onCreateSetButtonPressed;
+
+  const HomeScreen({super.key, required this.onCreateSetButtonPressed});
 
   @override
   State<HomeScreen> createState() => HomeScreenState();
@@ -73,7 +77,7 @@ class HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(width: 40, height: 40),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: widget.onCreateSetButtonPressed,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 76, 175, 80),// Background color
                   foregroundColor: Colors.white, // Text/icon color
@@ -103,11 +107,11 @@ class BottomNavBar extends StatefulWidget {
 
 class BottomNavBarState extends State<BottomNavBar> {
   int selectedIndex = 0;
+  final List<StudySet> finalSets = [];
 
-  List<Widget> widgetOptions = <Widget>[
-    HomeScreen(),
-    SetsScreen(),
-    CreateSetScreen(),
+  late List<Widget> widgetOptions = <Widget>[
+    HomeScreen(onCreateSetButtonPressed: () => onIconPressed(1)),
+    SetsScreen(sets: finalSets),
     ProfileScreen(),
   ];
 
@@ -130,7 +134,6 @@ class BottomNavBarState extends State<BottomNavBar> {
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
           BottomNavigationBarItem(icon: Icon(Icons.book), label: "Sets"),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: "Create Set"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
         currentIndex: selectedIndex,
@@ -165,7 +168,9 @@ class BottomNavBarState extends State<BottomNavBar> {
 // ];
 
 class SetsScreen extends StatefulWidget {
-  const SetsScreen({super.key});
+  final List<StudySet> sets;
+
+  const SetsScreen({super.key, required this.sets});
 
   @override
   State<SetsScreen> createState() => _SetsScreenState();
@@ -173,7 +178,7 @@ class SetsScreen extends StatefulWidget {
 
 class _SetsScreenState extends State<SetsScreen> {
   int numberOfSets = 0;
-  List<StudySet> sets = [];
+  // List<StudySet> sets = [];
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +191,7 @@ class _SetsScreenState extends State<SetsScreen> {
             onPressed: () {
               setState(() {
                 numberOfSets++;
-                sets.add(
+                widget.sets.add(
                   StudySet(
                     id: numberOfSets.toString(),
                     name: '',
@@ -199,14 +204,16 @@ class _SetsScreenState extends State<SetsScreen> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: sets.length,
+              itemCount: widget.sets.length,
               itemBuilder: (context, index) {
                 return SetWidget(
-                  key: ValueKey(sets[index].id),
-                  set: sets[index],
+                  key: ValueKey(widget.sets[index].id),
+                  set: widget.sets[index],
                   onDelete: (setToDelete) {
                     setState(() {
-                      sets.removeWhere((set_) => set_.id == setToDelete.id);
+                      widget.sets.removeWhere(
+                        (set_) => set_.id == setToDelete.id,
+                      );
                     });
                   },
                 );
@@ -219,16 +226,16 @@ class _SetsScreenState extends State<SetsScreen> {
   }
 }
 
-class CreateSetScreen extends StatelessWidget {
-  const CreateSetScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return const Text(
-      'Create Set Screen',
-      style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-    );
-  }
-}
+// class CreateSetScreen extends StatelessWidget {
+//   const CreateSetScreen({super.key});
+//   @override
+//   Widget build(BuildContext context) {
+//     return const Text(
+//       'Create Set Screen',
+//       style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+//     );
+//   }
+// }
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});

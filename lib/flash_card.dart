@@ -3,14 +3,51 @@ import 'package:google_fonts/google_fonts.dart';
 
 class FlashCard {
   final String id;
-  final String question;
-  final String answer;
+  String question;
+  String answer;
+  bool isEditing = true; // controls Done vs Trash
 
-  FlashCard({required this.id, required this.question, required this.answer});
+  FlashCard({
+    required this.id,
+    required this.question,
+    required this.answer,
+    this.isEditing = true,
+  });
 }
 
-class FlashCardWidget extends StatelessWidget {
-  const FlashCardWidget({super.key});
+class FlashCardWidget extends StatefulWidget {
+  final FlashCard flashCard;
+  final void Function(FlashCard flashCard)? onDeleteCard;
+
+  const FlashCardWidget({
+    super.key,
+    required this.flashCard,
+    this.onDeleteCard,
+  });
+
+  @override
+  State<FlashCardWidget> createState() => _FlashCardWidgetState();
+}
+
+class _FlashCardWidgetState extends State<FlashCardWidget> {
+  TextEditingController? questionController;
+  TextEditingController? answerController;
+
+  @override
+  void initState() {
+    super.initState();
+    questionController = TextEditingController(text: widget.flashCard.question);
+    answerController = TextEditingController(text: widget.flashCard.answer);
+  }
+
+  void onDonePressed() {
+    // Logic for when the Done button is pressed
+    setState(() {
+      widget.flashCard.isEditing = false;
+      widget.flashCard.question = questionController!.text;
+      widget.flashCard.answer = answerController!.text;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +62,11 @@ class FlashCardWidget extends StatelessWidget {
               children: [
                 Text("Q:", style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: TextField(
-                    decoration: InputDecoration(
+                    enabled: widget.flashCard.isEditing,
+                    controller: questionController,
+                    decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       hintText: 'Enter a question',
                       labelText: 'Question',
@@ -41,9 +80,11 @@ class FlashCardWidget extends StatelessWidget {
               children: [
                 Text("A:", style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: TextField(
-                    decoration: InputDecoration(
+                    enabled: widget.flashCard.isEditing,
+                    controller: answerController,
+                    decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       hintText: 'Enter the answer',
                       labelText: 'Answer',
@@ -52,6 +93,19 @@ class FlashCardWidget extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 10),
+            if (widget.flashCard.isEditing)
+              TextButton(onPressed: onDonePressed, child: Text("Done"))
+            else
+              IconButton(
+                icon: Icon(Icons.delete),
+                color: Colors.red,
+                onPressed: () {
+                  if (widget.onDeleteCard != null) {
+                    widget.onDeleteCard!(widget.flashCard);
+                  }
+                },
+              ),
           ],
         ),
       ),
