@@ -35,7 +35,8 @@ class _SetWidgetState extends State<SetWidget> {
   TextEditingController? descriptionController;
 
   final stt = STTService();
-  bool isListening = false;
+  bool isListeningDescription = false;
+  bool isListeningName = false;
 
   void donePressed() {
     setState(() {
@@ -99,18 +100,18 @@ class _SetWidgetState extends State<SetWidget> {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      if (!isListening) {
+                      if (!isListeningName) {
                         // Initialize speech-to-text first
-                        bool available = await stt.initialize();
-                        if (!available) {
-                          print(
-                            "Microphone not available or permission denied",
-                          );
-                          return;
-                        }
+                        // bool available = await stt.initialize();
+                        // if (!available) {
+                        //   print(
+                        //     "Microphone not available or permission denied",
+                        //   );
+                        //   return;
+                        // }
 
                         // Start listening
-                        setState(() => isListening = true);
+                        setState(() => isListeningName = true);
                         stt.startListening((text) {
                           setState(() {
                             nameController!.text = text;
@@ -119,7 +120,7 @@ class _SetWidgetState extends State<SetWidget> {
                       } else {
                         // Stop listening
                         stt.stopListening();
-                        setState(() => isListening = false);
+                        setState(() => isListeningName = false);
                       }
                     },
                     child: Container(
@@ -130,7 +131,7 @@ class _SetWidgetState extends State<SetWidget> {
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        isListening ? Icons.mic : Icons.mic_none,
+                        isListeningName ? Icons.mic : Icons.mic_none,
                         color: Colors.white,
                         size: 50,
                       ),
@@ -182,7 +183,7 @@ class _SetWidgetState extends State<SetWidget> {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      if (!isListening) {
+                      if (!isListeningDescription) {
                         // Initialize speech-to-text first
                         bool available = await stt.initialize();
                         if (!available) {
@@ -193,7 +194,7 @@ class _SetWidgetState extends State<SetWidget> {
                         }
 
                         // Start listening
-                        setState(() => isListening = true);
+                        setState(() => isListeningDescription = true);
                         stt.startListening((text) {
                           setState(() {
                             descriptionController!.text = text;
@@ -202,7 +203,7 @@ class _SetWidgetState extends State<SetWidget> {
                       } else {
                         // Stop listening
                         stt.stopListening();
-                        setState(() => isListening = false);
+                        setState(() => isListeningDescription = false);
                       }
                     },
                     child: Container(
@@ -213,7 +214,7 @@ class _SetWidgetState extends State<SetWidget> {
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        isListening ? Icons.mic : Icons.mic_none,
+                        isListeningDescription ? Icons.mic : Icons.mic_none,
                         color: Colors.white,
                         size: 50,
                       ),

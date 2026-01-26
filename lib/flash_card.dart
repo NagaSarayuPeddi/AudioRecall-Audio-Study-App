@@ -35,7 +35,8 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
   TextEditingController? answerController;
 
   final stt = STTService();
-  bool isListening = false;
+  bool isListeningAnswer = false;
+  bool isListeningQuestion = false;
 
   @override
   void initState() {
@@ -79,7 +80,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                 ),
                 GestureDetector(
                   onTap: () async {
-                    if (!isListening) {
+                    if (!isListeningQuestion) {
                       // Initialize speech-to-text first
                       bool available = await stt.initialize();
                       if (!available) {
@@ -88,7 +89,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                       }
 
                       // Start listening
-                      setState(() => isListening = true);
+                      setState(() => isListeningQuestion = true);
                       stt.startListening((text) {
                         setState(() {
                           questionController!.text = text;
@@ -97,7 +98,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                     } else {
                       // Stop listening
                       stt.stopListening();
-                      setState(() => isListening = false);
+                      setState(() => isListeningQuestion = false);
                     }
                   },
                   child: Container(
@@ -108,7 +109,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      isListening ? Icons.mic : Icons.mic_none,
+                      isListeningQuestion ? Icons.mic : Icons.mic_none,
                       color: Colors.white,
                       size: 50,
                     ),
@@ -134,7 +135,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                 ),
                 GestureDetector(
                   onTap: () async {
-                    if (!isListening) {
+                    if (!isListeningAnswer) {
                       // Initialize speech-to-text first
                       bool available = await stt.initialize();
                       if (!available) {
@@ -143,7 +144,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                       }
 
                       // Start listening
-                      setState(() => isListening = true);
+                      setState(() => isListeningAnswer = true);
                       stt.startListening((text) {
                         setState(() {
                           answerController!.text = text;
@@ -152,7 +153,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                     } else {
                       // Stop listening
                       stt.stopListening();
-                      setState(() => isListening = false);
+                      setState(() => isListeningAnswer = false);
                     }
                   },
                   child: Container(
@@ -163,7 +164,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      isListening ? Icons.mic : Icons.mic_none,
+                      isListeningAnswer ? Icons.mic : Icons.mic_none,
                       color: Colors.white,
                       size: 50,
                     ),
