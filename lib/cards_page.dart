@@ -57,10 +57,12 @@ class CardPageState extends State<CardPage> {
                       context: context,
                       builder: (BuildContext dialogContext) {
                         return AlertDialog(
-                          title: const Text('Delete Card'),
-                          content: const Text(
-                            'Are you sure you want to delete this flash card?',
-                          ),
+                         content: const Text(
+                           'Are you sure you want to delete this flash card?',
+                           style: TextStyle(fontSize: 20),
+                           textAlign: TextAlign.center,
+                         ),
+                        
                           actions: [
                             TextButton(
                               onPressed: () {
