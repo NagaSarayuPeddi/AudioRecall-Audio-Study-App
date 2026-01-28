@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       title: 'Audio Study App',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 157, 36, 179),
+          seedColor: const Color.fromARGB(255, 0, 150, 136),
         ),
         textTheme: TextTheme(
           displayLarge: const TextStyle(
@@ -138,7 +138,7 @@ class BottomNavBarState extends State<BottomNavBar> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: "Home",
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            backgroundColor: const Color.fromARGB(31, 255, 255, 255),
           ),
           BottomNavigationBarItem(icon: Icon(Icons.book), label: "Sets"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
