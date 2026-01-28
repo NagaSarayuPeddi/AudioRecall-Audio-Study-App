@@ -53,11 +53,39 @@ class CardPageState extends State<CardPage> {
               itemBuilder: (context, index) {
                 return FlashCardWidget(
                   onDeleteCard: (flashCard) {
-                    setState(() {
-                      widget.cardSet.flashCards.removeWhere(
-                        (card) => card.id == flashCard.id,
-                      );
-                    });
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext dialogContext) {
+                        return AlertDialog(
+                          title: const Text('Delete Card'),
+                          content: const Text(
+                            'Are you sure you want to delete this flash card?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(dialogContext);
+                              },
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  widget.cardSet.flashCards.removeWhere(
+                                    (card) => card.id == flashCard.id,
+                                  );
+                                });
+                                Navigator.pop(dialogContext);
+                              },
+                              child: const Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                   flashCard: widget.cardSet.flashCards[index],
                   key: ValueKey(widget.cardSet.flashCards[index].id),
