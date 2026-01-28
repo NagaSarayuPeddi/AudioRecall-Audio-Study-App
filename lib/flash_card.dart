@@ -71,15 +71,19 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                 Text("Q:", style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: TextField(
-                    enabled: widget.flashCard.isEditing,
-                    controller: questionController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Enter a question',
-                      labelText: 'Question',
-                    ),
-                  ),
+                  child: widget.flashCard.isEditing
+                      ? TextField(
+                          controller: questionController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: 'Enter a question',
+                            labelText: 'Question',
+                          ),
+                        )
+                      : Text(
+                          widget.flashCard.question,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
                 ),
                 GestureDetector(
                   onTap: () async {
@@ -129,15 +133,19 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                 Text("A:", style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: TextField(
-                    enabled: widget.flashCard.isEditing,
-                    controller: answerController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Enter the answer',
-                      labelText: 'Answer',
-                    ),
-                  ),
+                  child: widget.flashCard.isEditing
+                      ? TextField(
+                          controller: answerController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: 'Enter the answer',
+                            labelText: 'Answer',
+                          ),
+                        )
+                      : Text(
+                          widget.flashCard.answer,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
                 ),
                 GestureDetector(
                   onTap: () async {

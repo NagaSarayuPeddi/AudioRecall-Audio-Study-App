@@ -91,14 +91,24 @@ class _SetWidgetState extends State<SetWidget> {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: TextField(
-                      enabled: widget.set.isEditing,
-                      controller: nameController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Enter set name',
-                        labelText: 'Set Name',
-                      ),
+                    child: Builder(
+                      builder: (context) {
+                        if (widget.set.isEditing) {
+                          return TextField(
+                            controller: nameController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter set name',
+                              labelText: 'Set Name',
+                            ),
+                          );
+                        } else {
+                          return Text(
+                            widget.set.name,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          );
+                        }
+                      },
                     ),
                   ),
                   GestureDetector(
@@ -177,14 +187,24 @@ class _SetWidgetState extends State<SetWidget> {
               Row(
                 children: [
                   Expanded(
-                    child: TextField(
-                      enabled: widget.set.isEditing,
-                      controller: descriptionController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Enter description',
-                        labelText: 'Decription',
-                      ),
+                    child: Builder(
+                      builder: (context) {
+                        if (widget.set.isEditing) {
+                          return TextField(
+                            controller: descriptionController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter description',
+                              labelText: 'Description',
+                            ),
+                          );
+                        } else {
+                          return Text(
+                            widget.set.description,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          );
+                        }
+                      },
                     ),
                   ),
                   GestureDetector(
