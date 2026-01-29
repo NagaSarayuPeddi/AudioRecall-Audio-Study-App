@@ -217,11 +217,41 @@ class _SetsScreenState extends State<SetsScreen> {
                   key: ValueKey(widget.sets[index].id),
                   set: widget.sets[index],
                   onDelete: (setToDelete) {
-                    setState(() {
-                      widget.sets.removeWhere(
-                        (set_) => set_.id == setToDelete.id,
-                      );
-                    });
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext dialogContext) {
+                        return AlertDialog(
+                          content: const Text(
+                            'Are you sure you want to delete this set?',
+                            style: TextStyle(fontSize: 20),
+                            textAlign: TextAlign.center,
+                          ),
+
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(dialogContext);
+                              },
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  widget.sets.removeWhere(
+                                    (set_) => set_.id == setToDelete.id,
+                                  );
+                                });
+                                Navigator.pop(dialogContext);
+                              },
+                              child: const Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                 );
               },
