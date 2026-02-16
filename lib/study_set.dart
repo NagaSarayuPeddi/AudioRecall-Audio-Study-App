@@ -77,6 +77,7 @@ class _SetWidgetState extends State<SetWidget> {
       },
       style: TextButton.styleFrom(padding: EdgeInsets.zero),
       child: Card(
+        color: Color.fromRGBO(255, 194, 10, 10),
         margin: const EdgeInsets.all(10),
         child: Padding(
           padding: const EdgeInsets.all(15.0),
@@ -111,74 +112,84 @@ class _SetWidgetState extends State<SetWidget> {
                       },
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () async {
-                      if (!isListeningName) {
-                        // Initialize speech-to-text first
-                        // bool available = await stt.initialize();
-                        // if (!available) {
-                        //   print(
-                        //     "Microphone not available or permission denied",
-                        //   );
-                        //   return;
-                        // }
-                        await tts.speak(
-                          "Microphone activated. Start speaking the set name.",
+                  Builder(
+                    builder: (context) {
+                      if (widget.set.isEditing) {
+                        return GestureDetector(
+                          onTap: () async {
+                            if (!isListeningName) {
+                              // Initialize speech-to-text first
+                              // bool available = await stt.initialize();
+                              // if (!available) {
+                              //   print(
+                              //     "Microphone not available or permission denied",
+                              //   );
+                              //   return;
+                              // }
+                              await tts.speak(
+                                "Microphone activated. Start speaking the set name.",
+                              );
+                              // Start listening
+                              setState(() => isListeningName = true);
+                              await stt.listen(
+                                onResult: (text) {
+                                  setState(() {
+                                    nameController!.text = text;
+                                  });
+                                },
+                              );
+                            } else {
+                              // Stop listening
+                              await tts.speak("Microphone deactivated.");
+                              stt.stopListening();
+                              setState(() => isListeningName = false);
+                            }
+                          },
+                          child: Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: Colors.purple,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              isListeningName ? Icons.mic : Icons.mic_none,
+                              color: Colors.white,
+                              size: 50,
+                            ),
+                          ),
+                          // child: IconButton(
+                          //   icon: Icon(isListening ? Icons.mic : Icons.mic_none),
+                          // onPressed: () async {
+                          //   if (!isListening) {
+                          //     // Initialize speech-to-text first
+                          //     bool available = await stt.initialize();
+                          //     if (!available) {
+                          //       print(
+                          //         "Microphone not available or permission denied",
+                          //       );
+                          //       return;
+                          //     }
+
+                          //     // Start listening
+                          //     setState(() => isListening = true);
+                          //     stt.startListening((text) {
+                          //       setState(() {
+                          //         nameController!.text = text;
+                          //       });
+                          //     });
+                          //   } else {
+                          //     // Stop listening
+                          //     stt.stopListening();
+                          //     setState(() => isListening = false);
+                          //   }
+                          // },
+                          //),
                         );
-                        // Start listening
-                        setState(() => isListeningName = true);
-                        stt.startListening((text) {
-                          setState(() {
-                            nameController!.text = text;
-                          });
-                        });
                       } else {
-                        // Stop listening
-                        await tts.speak("Microphone deactivated.");
-                        stt.stopListening();
-                        setState(() => isListeningName = false);
+                        return const SizedBox.shrink();
                       }
                     },
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.purple,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        isListeningName ? Icons.mic : Icons.mic_none,
-                        color: Colors.white,
-                        size: 50,
-                      ),
-                    ),
-                    // child: IconButton(
-                    //   icon: Icon(isListening ? Icons.mic : Icons.mic_none),
-                    // onPressed: () async {
-                    //   if (!isListening) {
-                    //     // Initialize speech-to-text first
-                    //     bool available = await stt.initialize();
-                    //     if (!available) {
-                    //       print(
-                    //         "Microphone not available or permission denied",
-                    //       );
-                    //       return;
-                    //     }
-
-                    //     // Start listening
-                    //     setState(() => isListening = true);
-                    //     stt.startListening((text) {
-                    //       setState(() {
-                    //         nameController!.text = text;
-                    //       });
-                    //     });
-                    //   } else {
-                    //     // Stop listening
-                    //     stt.stopListening();
-                    //     setState(() => isListening = false);
-                    //   }
-                    // },
-                    //),
                   ),
                 ],
               ),
@@ -201,55 +212,67 @@ class _SetWidgetState extends State<SetWidget> {
                         } else {
                           return Text(
                             widget.set.description,
-                            style: Theme.of(context).textTheme.titleMedium,
+                            style: Theme.of(context).textTheme.displaySmall,
                           );
                         }
                       },
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () async {
-                      if (!isListeningDescription) {
-                        // Initialize speech-to-text first
-                        bool available = await stt.initialize();
-                        if (!available) {
-                          print(
-                            "Microphone not available or permission denied",
-                          );
-                          return;
-                        }
+                  Builder(
+                    builder: (context) {
+                      if (widget.set.isEditing) {
+                        return GestureDetector(
+                          onTap: () async {
+                            if (!isListeningDescription) {
+                              // Initialize speech-to-text first
+                              bool available = await stt.initialize();
+                              if (!available) {
+                                print(
+                                  "Microphone not available or permission denied",
+                                );
+                                return;
+                              }
 
-                        await tts.speak(
-                          "Microphone activated. Start speaking the description.",
+                              await tts.speak(
+                                "Microphone activated. Start speaking the description.",
+                              );
+
+                              // Start listening
+                              setState(() => isListeningDescription = true);
+                              await stt.listen(
+                                onResult: (text) {
+                                  setState(() {
+                                    descriptionController!.text = text;
+                                  });
+                                },
+                              );
+                            } else {
+                              await tts.speak("Microphone deactivated.");
+                              // Stop listening
+                              stt.stopListening();
+                              setState(() => isListeningDescription = false);
+                            }
+                          },
+                          child: Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: Colors.purple,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              isListeningDescription
+                                  ? Icons.mic
+                                  : Icons.mic_none,
+                              color: Colors.white,
+                              size: 50,
+                            ),
+                          ),
                         );
-
-                        // Start listening
-                        setState(() => isListeningDescription = true);
-                        stt.startListening((text) {
-                          setState(() {
-                            descriptionController!.text = text;
-                          });
-                        });
                       } else {
-                        await tts.speak("Microphone deactivated.");
-                        // Stop listening
-                        stt.stopListening();
-                        setState(() => isListeningDescription = false);
+                        return const SizedBox.shrink();
                       }
                     },
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.purple,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        isListeningDescription ? Icons.mic : Icons.mic_none,
-                        color: Colors.white,
-                        size: 50,
-                      ),
-                    ),
                   ),
                 ],
               ),
@@ -257,15 +280,24 @@ class _SetWidgetState extends State<SetWidget> {
               if (widget.set.isEditing)
                 TextButton(onPressed: donePressed, child: const Text('Done'))
               else
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
-                    if (widget.onDelete != null) {
-                      widget.onDelete?.call(
-                        widget.set,
-                      ); // notify parent to delete this set
-                    }
-                  },
+                Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    iconSize: 30,
+                    onPressed: () {
+                      if (widget.onDelete != null) {
+                        widget.onDelete?.call(
+                          widget.set,
+                        ); // notify parent to delete this set
+                      }
+                    },
+                  ),
                 ),
             ],
           ),

@@ -85,45 +85,57 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                 ),
-                GestureDetector(
-                  onTap: () async {
-                    if (!isListeningQuestion) {
-                      // Initialize speech-to-text first
-                      bool available = await stt.initialize();
-                      if (!available) {
-                        print("Microphone not available or permission denied");
-                        return;
-                      }
-                      await tts.speak(
-                        "Microphone activated. Start speaking the question.",
+                Builder(
+                  builder: (context) {
+                    if (widget.flashCard.isEditing) {
+                      return GestureDetector(
+                        onTap: () async {
+                          if (!isListeningQuestion) {
+                            // Initialize speech-to-text first
+                            bool available = await stt.initialize();
+                            if (!available) {
+                              print(
+                                "Microphone not available or permission denied",
+                              );
+                              return;
+                            }
+                            await tts.speak(
+                              "Microphone activated. Start speaking the question.",
+                            );
+                            // Start listening
+                            setState(() => isListeningQuestion = true);
+                            await stt.listen(
+                              onResult: (text) {
+                                setState(() {
+                                  questionController!.text = text;
+                                });
+                              },
+                            );
+                          } else {
+                            await tts.speak("Microphone deactivated.");
+                            // Stop listening
+                            stt.stopListening();
+                            setState(() => isListeningQuestion = false);
+                          }
+                        },
+                        child: Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: Colors.purple,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            isListeningQuestion ? Icons.mic : Icons.mic_none,
+                            color: Colors.white,
+                            size: 50,
+                          ),
+                        ),
                       );
-                      // Start listening
-                      setState(() => isListeningQuestion = true);
-                      stt.startListening((text) {
-                        setState(() {
-                          questionController!.text = text;
-                        });
-                      });
                     } else {
-                      await tts.speak("Microphone deactivated.");
-                      // Stop listening
-                      stt.stopListening();
-                      setState(() => isListeningQuestion = false);
+                      return SizedBox.shrink();
                     }
                   },
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.purple,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      isListeningQuestion ? Icons.mic : Icons.mic_none,
-                      color: Colors.white,
-                      size: 50,
-                    ),
-                  ),
                 ),
               ],
             ),
@@ -147,47 +159,59 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                 ),
-                GestureDetector(
-                  onTap: () async {
-                    if (!isListeningAnswer) {
-                      // Initialize speech-to-text first
-                      bool available = await stt.initialize();
-                      if (!available) {
-                        print("Microphone not available or permission denied");
-                        return;
-                      }
+                Builder(
+                  builder: (context) {
+                    if (widget.flashCard.isEditing) {
+                      return GestureDetector(
+                        onTap: () async {
+                          if (!isListeningAnswer) {
+                            // Initialize speech-to-text first
+                            bool available = await stt.initialize();
+                            if (!available) {
+                              print(
+                                "Microphone not available or permission denied",
+                              );
+                              return;
+                            }
 
-                      await tts.speak(
-                        "Microphone activated. Start speaking the answer.",
+                            await tts.speak(
+                              "Microphone activated. Start speaking the answer.",
+                            );
+
+                            // Start listening
+                            setState(() => isListeningAnswer = true);
+                            await stt.listen(
+                              onResult: (text) {
+                                setState(() {
+                                  answerController!.text = text;
+                                });
+                              },
+                            );
+                          } else {
+                            await tts.speak("Microphone deactivated.");
+                            // Stop listening
+                            stt.stopListening();
+                            setState(() => isListeningAnswer = false);
+                          }
+                        },
+                        child: Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: Colors.purple,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            isListeningAnswer ? Icons.mic : Icons.mic_none,
+                            color: Colors.white,
+                            size: 50,
+                          ),
+                        ),
                       );
-
-                      // Start listening
-                      setState(() => isListeningAnswer = true);
-                      stt.startListening((text) {
-                        setState(() {
-                          answerController!.text = text;
-                        });
-                      });
                     } else {
-                      await tts.speak("Microphone deactivated.");
-                      // Stop listening
-                      stt.stopListening();
-                      setState(() => isListeningAnswer = false);
+                      return SizedBox.shrink();
                     }
                   },
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.purple,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      isListeningAnswer ? Icons.mic : Icons.mic_none,
-                      color: Colors.white,
-                      size: 50,
-                    ),
-                  ),
                 ),
               ],
             ),

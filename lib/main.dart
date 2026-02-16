@@ -19,16 +19,26 @@ class MyApp extends StatelessWidget {
       title: 'Audio Study App',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 0, 150, 136),
+          seedColor: const Color.fromARGB(255, 0, 132, 255),
         ),
         textTheme: TextTheme(
           displayLarge: const TextStyle(
             fontSize: 72,
             fontWeight: FontWeight.bold,
+            color: Color.fromRGBO(255, 194, 10, 10),
           ),
-          titleLarge: GoogleFonts.oswald(fontSize: 30),
+          titleLarge: GoogleFonts.poppins(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            // color: Color.fromRGBO(255, 194, 10, 10),
+          ),
+          titleMedium: GoogleFonts.poppins(
+            fontSize: 40,
+            fontWeight: FontWeight.bold,
+            color: Color.fromRGBO(12, 123, 220, 10),
+          ),
           bodyMedium: GoogleFonts.poppins(),
-          displaySmall: GoogleFonts.pacifico(),
+          displaySmall: GoogleFonts.poppins(color: Colors.black, fontSize: 24),
         ),
       ),
       home: const BottomNavBar(),
@@ -49,7 +59,7 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 250, 240),
+      backgroundColor: Color.fromRGBO(12, 123, 220, 10),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Center(
@@ -65,14 +75,14 @@ class HomeScreenState extends State<HomeScreen> {
               Text(
                 "Welcome to Audio Study App",
                 style: GoogleFonts.poppins(
-                  textStyle: Theme.of(context).textTheme.displaySmall,
+                  textStyle: Theme.of(context).textTheme.titleLarge,
                 ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(width: 40, height: 40),
               Divider(
                 // Horizontal line separator
-                color: const Color.fromARGB(255, 64, 194, 183),
+                color: const Color.fromRGBO(255, 194, 10, 10),
                 thickness: 3, // Line thickness
                 indent: 16, // Space at the start of the line
                 endIndent: 16, // Space at the end of the line
@@ -81,11 +91,11 @@ class HomeScreenState extends State<HomeScreen> {
               ElevatedButton(
                 onPressed: widget.onCreateSetButtonPressed,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(
+                  backgroundColor: const Color.fromRGBO(
                     255,
-                    76,
-                    175,
-                    80,
+                    194,
+                    10,
+                    10,
                   ), // Background color
                   foregroundColor: Colors.white, // Text/icon color
                   shadowColor: Colors.black, // Shadow color
@@ -95,7 +105,12 @@ class HomeScreenState extends State<HomeScreen> {
                     vertical: 60,
                   ),
                 ),
-                child: Text("Create New Set", style: TextStyle(fontSize: 50)),
+                child: Text(
+                  "Create New Set",
+                  style: GoogleFonts.poppins(
+                    textStyle: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
               ),
             ],
           ),
@@ -190,6 +205,7 @@ class _SetsScreenState extends State<SetsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromRGBO(12, 123, 220, 10),
       appBar: AppBar(title: const Text('Sets')),
       body: Column(
         children: [

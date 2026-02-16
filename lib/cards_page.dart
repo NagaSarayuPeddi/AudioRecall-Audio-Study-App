@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 //import 'package:google_fonts/google_fonts.dart';
 import 'flash_card.dart';
 import 'study_set.dart';
+import 'study_session.dart';
 
 // class CardPage {
 //   final String id;
@@ -47,6 +48,7 @@ class CardPageState extends State<CardPage> {
               });
             },
           ),
+          StudySession(setToStudy: widget.cardSet),
           Expanded(
             child: ListView.builder(
               itemCount: widget.cardSet.flashCards.length,
@@ -57,12 +59,12 @@ class CardPageState extends State<CardPage> {
                       context: context,
                       builder: (BuildContext dialogContext) {
                         return AlertDialog(
-                         content: const Text(
-                           'Are you sure you want to delete this flash card?',
-                           style: TextStyle(fontSize: 20),
-                           textAlign: TextAlign.center,
-                         ),
-                        
+                          content: const Text(
+                            'Are you sure you want to delete this flash card?',
+                            style: TextStyle(fontSize: 20),
+                            textAlign: TextAlign.center,
+                          ),
+
                           actions: [
                             TextButton(
                               onPressed: () {
