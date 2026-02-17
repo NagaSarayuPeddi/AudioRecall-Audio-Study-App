@@ -4,6 +4,7 @@ class TTSService {
   final FlutterTts _flutterTts = FlutterTts();
 
   Future<void> speak(String text) async {
+    await _flutterTts.awaitSpeakCompletion(true);
     await _flutterTts.speak(text);
   }
 

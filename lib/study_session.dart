@@ -38,139 +38,123 @@ class _StudySessionState extends State<StudySession> {
     await tts.speak(
       'Starting study session for set ${widget.setToStudy.name}.',
     );
-    await readAnswer();
-    await Future.delayed(const Duration(milliseconds: 500));
-    startListening();
+    // await readAnswer();
+    // await Future.delayed(const Duration(milliseconds: 500));
+    //startListening();
+
+    while (isSessionActive) {
+      if (currentQuestionIndex >= widget.setToStudy.flashCards.length) {
+        await tts.speak(
+          "Congratulations! You have completed the study session.",
+        );
+
+        endSession();
+        return;
+      }
+
+      await readAnswer();
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      String userAnswer = await listenOnce();
+      String expectedAnswer = widget
+          .setToStudy
+          .flashCards[currentQuestionIndex]
+          .question
+          .toLowerCase()
+          .trim();
+      if (userAnswer.contains("stop")) {
+        await tts.speak("Study session ended. Great job!");
+
+        endSession();
+        return;
+      }
+      if (userAnswer.contains(expectedAnswer)) {
+        await tts.speak("Correct!");
+        currentQuestionIndex++;
+      } else {
+        await tts.speak("Try again!");
+        //userAnswer = await listenOnce();
+      }
+    }
+  }
+
+  Future<String> listenOnce() async {
+    String resultText = "";
+
+    await stt.listen(
+      onResult: (spokenText) {
+        resultText = spokenText;
+      },
+    );
+
+    await Future.delayed(Duration(seconds: 3));
+
+    await stt.stopListening();
+
+    await Future.delayed(Duration(milliseconds: 500));
+
+    return resultText.toLowerCase().trim();
   }
 
   // void startListening() async {
-  //   String spoken = '';
   //   if (!await stt.initialize()) {
   //     print("Speech recognition not available");
   //     return;
   //   }
-  //   // if (!isListening) {
+
   //   setState(() => isListening = true);
 
   //   await stt.listen(
-  //     onResult: (result) async {
-  //       spoken = result.toLowerCase().trim();
+  //     onResult: (spokenText) async {
+  //       String spoken = spokenText.toLowerCase().trim();
+  //       String expected = widget
+  //           .setToStudy
+  //           .flashCards[currentQuestionIndex]
+  //           .question
+  //           .toLowerCase()
+  //           .trim();
+
   //       print("Spoken: $spoken");
-  //       print(
-  //         "Expected: ${widget.setToStudy.flashCards[currentQuestionIndex].question.toLowerCase().trim()}",
-  //       );
+  //       print("Expected: $expected");
+
+  //       // Stop listening once we got a result
+  //       await stt.stopListening();
+  //       setState(() => isListening = false);
+
+  //       // Check for stop command
+  //       if (spoken.contains("stop")) {
+  //         await tts.speak("Study session ended. Great job!");
+  //         endSession();
+  //         return;
+  //       }
+
+  //       // Check if user said the correct word
+  //       if (spoken.contains(expected)) {
+  //         await tts.speak("Correct!");
+  //         await Future.delayed(Duration(milliseconds: 500));
+
+  //         if (currentQuestionIndex < widget.setToStudy.flashCards.length - 1) {
+  //           setState(() => currentQuestionIndex++);
+  //           await Future.delayed(Duration(milliseconds: 300));
+
+  //           await readAnswer(); // speak next definition
+  //           await Future.delayed(Duration(milliseconds: 700));
+
+  //           startListening(); // listen for next word
+  //         } else {
+  //           await tts.speak(
+  //             "Congratulations! You have completed the study session.",
+  //           );
+  //           endSession();
+  //         }
+  //       } else {
+  //         await tts.speak("Try again!");
+  //         await Future.delayed(Duration(milliseconds: 500));
+  //         startListening(); // try again
+  //       }
   //     },
   //   );
-  //   await stt.stopListening();
-
-  //   // if (spoken.contains("done") || spoken.contains("ready")) {
-  //   //   readAnswer();
-  //   // }
-  //   if (spoken.contains("stop")) {
-  //     endSession();
-  //     await tts.speak('Study session ended. Great job!');
-  //     return;
-  //   } else if (spoken.contains(
-  //     widget.setToStudy.flashCards[currentQuestionIndex].question
-  //         .toLowerCase()
-  //         .trim(),
-  //   )) {
-  //     //await stt.stopListening();
-  //     // setState(() {
-  //     //   isListening = false;
-  //     // });
-  //     await tts.speak('Correct!');
-  //     Future.delayed(const Duration(seconds: 2), () async {
-  //       if (currentQuestionIndex < widget.setToStudy.flashCards.length - 1) {
-  //         setState(() {
-  //           currentQuestionIndex++;
-  //         });
-  //         await readAnswer();
-  //         startListening();
-  //         // setState(() {
-  //         //   isListening = true;
-  //         // });
-  //       } else {
-  //         endSession();
-  //         await tts.speak(
-  //           'Congratulations! You have completed the study session.',
-  //         );
-  //       }
-  //     });
-  //   } else {
-  //     //await stt.stopListening();
-  //     // setState(() {
-  //     //   isListening = false;
-  //     // });
-  //     await tts.speak('Try again!');
-  //     startListening();
-  //   }
-
-  //   // if (spoken.contains("stop")) {
-  //   //   endSession();
-  //   //   await tts.speak('Study session ended. Great job!');
-  //   // }
-  //   //},
-  //   // );
-  //   // }
   // }
-
-  void startListening() async {
-    if (!await stt.initialize()) {
-      print("Speech recognition not available");
-      return;
-    }
-
-    setState(() => isListening = true);
-
-    await stt.listen(
-      onResult: (spokenText) async {
-        String spoken = spokenText.toLowerCase().trim();
-        String expected = widget
-            .setToStudy
-            .flashCards[currentQuestionIndex]
-            .question
-            .toLowerCase()
-            .trim();
-
-        print("Spoken: $spoken");
-        print("Expected: $expected");
-
-        // Stop listening once we got a result
-        await stt.stopListening();
-        setState(() => isListening = false);
-
-        // Check for stop command
-        if (spoken.contains("stop")) {
-          await tts.speak("Study session ended. Great job!");
-          endSession();
-          return;
-        }
-
-        // Check if user said the correct word
-        if (spoken.contains(expected)) {
-          await tts.speak("Correct!");
-          await Future.delayed(Duration(milliseconds: 500));
-
-          if (currentQuestionIndex < widget.setToStudy.flashCards.length - 1) {
-            setState(() => currentQuestionIndex++);
-            await readAnswer();
-            await Future.delayed(Duration(milliseconds: 500));
-            startListening(); // listen for next word
-          } else {
-            await tts.speak(
-              "Congratulations! You have completed the study session.",
-            );
-            endSession();
-          }
-        } else {
-          await tts.speak("Try again!");
-          await Future.delayed(Duration(milliseconds: 500));
-          startListening(); // try again
-        }
-      },
-    );
-  }
 
   Future<void> endSession() async {
     await stt.stopListening();

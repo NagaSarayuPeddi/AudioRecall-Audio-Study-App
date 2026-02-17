@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
           displayLarge: const TextStyle(
             fontSize: 72,
             fontWeight: FontWeight.bold,
-            color: Color.fromRGBO(255, 194, 10, 10),
+            color: Colors.black,
           ),
           titleLarge: GoogleFonts.poppins(
             fontSize: 30,

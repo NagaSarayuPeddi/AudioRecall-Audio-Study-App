@@ -156,7 +156,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                         )
                       : Text(
                           widget.flashCard.answer,
-                          style: Theme.of(context).textTheme.titleMedium,
+                          style: Theme.of(context).textTheme.displaySmall,
                         ),
                 ),
                 Builder(
