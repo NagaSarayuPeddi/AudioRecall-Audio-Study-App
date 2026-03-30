@@ -36,6 +36,8 @@ dependencies:
   google_fonts: ^7.0.2
   speech_to_text: ^7.3.0
   flutter_tts: ^4.2.5
+  csv: ^5.0.2
+  file_picker: ^10.3.10
 
 dev_dependencies:
   flutter_test:

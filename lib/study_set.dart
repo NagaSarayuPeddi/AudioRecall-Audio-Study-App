@@ -6,7 +6,7 @@ import 'services/stt_service.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 class StudySet {
-  final String id;
+  String id;
   String name;
   String description;
   List<FlashCard> flashCards;
@@ -84,38 +84,50 @@ class _SetWidgetState extends State<SetWidget> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Text(
-                    "Set Name: ",
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Builder(
-                      builder: (context) {
-                        if (widget.set.isEditing) {
-                          return TextField(
-                            controller: nameController,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              hintText: 'Enter set name',
-                              labelText: 'Set Name',
-                            ),
-                          );
-                        } else {
-                          return Text(
-                            widget.set.name,
-                            style: Theme.of(context).textTheme.titleLarge,
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                  Builder(
-                    builder: (context) {
-                      if (widget.set.isEditing) {
-                        return GestureDetector(
+              Builder(
+                builder: (context) {
+                  if (widget.set.isEditing) {
+                    return Row(
+                      children: [
+                        Text(
+                          "Set Name: ",
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(width: 10),
+                        TextField(
+                          controller: nameController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: 'Enter set name',
+                            labelText: 'Set Name',
+                          ),
+                        ),
+                        // Expanded(
+                        //   child: Builder(
+                        //     builder: (context) {
+                        //       if (widget.set.isEditing) {
+                        //         return TextField(
+                        //           controller: nameController,
+                        //           decoration: const InputDecoration(
+                        //             border: OutlineInputBorder(),
+                        //             hintText: 'Enter set name',
+                        //             labelText: 'Set Name',
+                        //           ),
+                        //         );
+                        //       } else {
+                        //         return Text(
+                        //           widget.set.name,
+                        //           style: Theme.of(context).textTheme.titleLarge,
+                        //         );
+                        //       }
+                        //     },
+                        //   ),
+                        // ),
+                        // Builder(
+                        //   builder: (context) {
+                        //     if (widget.set.isEditing) {
+                        //       return
+                        GestureDetector(
                           onTap: () async {
                             if (!isListeningName) {
                               // Initialize speech-to-text first
@@ -185,13 +197,21 @@ class _SetWidgetState extends State<SetWidget> {
                           //   }
                           // },
                           //),
-                        );
-                      } else {
-                        return const SizedBox.shrink();
-                      }
-                    },
-                  ),
-                ],
+                        ),
+                        // } else {
+                        //   return const SizedBox.shrink();
+                        // }
+                        //   },
+                        // ),
+                      ],
+                    );
+                  } else {
+                    return Text(
+                      widget.set.name,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    );
+                  }
+                },
               ),
               const SizedBox(height: 10),
 
@@ -210,10 +230,11 @@ class _SetWidgetState extends State<SetWidget> {
                             ),
                           );
                         } else {
-                          return Text(
-                            widget.set.description,
-                            style: Theme.of(context).textTheme.displaySmall,
-                          );
+                          // return Text(
+                          //   widget.set.description,
+                          //   style: Theme.of(context).textTheme.displaySmall,
+                          // );
+                          return SizedBox(width: 0, height: 0);
                         }
                       },
                     ),

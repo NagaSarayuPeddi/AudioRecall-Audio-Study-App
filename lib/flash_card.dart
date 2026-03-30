@@ -66,29 +66,28 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Text("Q:", style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: widget.flashCard.isEditing
-                      ? TextField(
+            Builder(
+              builder: (context) {
+                if (widget.flashCard.isEditing) {
+                  return Row(
+                    children: [
+                      Text("Q:", style: Theme.of(context).textTheme.titleLarge),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
                           controller: questionController,
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             hintText: 'Enter a question',
                             labelText: 'Question',
                           ),
-                        )
-                      : Text(
-                          widget.flashCard.question,
-                          style: Theme.of(context).textTheme.titleLarge,
                         ),
-                ),
-                Builder(
-                  builder: (context) {
-                    if (widget.flashCard.isEditing) {
-                      return GestureDetector(
+                        // Text(
+                        //     widget.flashCard.question,
+                        //     style: Theme.of(context).textTheme.titleLarge,
+                        //   ),
+                      ),
+                      GestureDetector(
                         onTap: () async {
                           if (!isListeningQuestion) {
                             // Initialize speech-to-text first
@@ -131,38 +130,44 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                             size: 50,
                           ),
                         ),
-                      );
-                    } else {
-                      return SizedBox.shrink();
-                    }
-                  },
-                ),
-              ],
+                      ),
+                    ],
+                  );
+                } else {
+                  return Text(
+                    widget.flashCard.question,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  );
+                }
+              },
             ),
             const SizedBox(height: 15),
-            Row(
-              children: [
-                Text("A:", style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: widget.flashCard.isEditing
-                      ? TextField(
-                          controller: answerController,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            hintText: 'Enter the answer',
-                            labelText: 'Answer',
-                          ),
-                        )
-                      : Text(
-                          widget.flashCard.answer,
-                          style: Theme.of(context).textTheme.displaySmall,
-                        ),
-                ),
-                Builder(
-                  builder: (context) {
-                    if (widget.flashCard.isEditing) {
-                      return GestureDetector(
+            Builder(
+              builder: (context) {
+                if (widget.flashCard.isEditing) {
+                  return Row(
+                    children: [
+                      Text(
+                        "A:",
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: widget.flashCard.isEditing
+                            ? TextField(
+                                controller: answerController,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  hintText: 'Enter the answer',
+                                  labelText: 'Answer',
+                                ),
+                              )
+                            : Text(
+                                widget.flashCard.answer,
+                                style: Theme.of(context).textTheme.displaySmall,
+                              ),
+                      ),
+                      GestureDetector(
                         onTap: () async {
                           if (!isListeningAnswer) {
                             // Initialize speech-to-text first
@@ -207,13 +212,16 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                             size: 50,
                           ),
                         ),
-                      );
-                    } else {
-                      return SizedBox.shrink();
-                    }
-                  },
-                ),
-              ],
+                      ),
+                    ],
+                  );
+                } else {
+                  return Text(
+                    widget.flashCard.answer,
+                    style: Theme.of(context).textTheme.displaySmall,
+                  );
+                }
+              },
             ),
             const SizedBox(height: 10),
             if (widget.flashCard.isEditing)

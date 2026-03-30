@@ -4,75 +4,56 @@ import 'flash_card.dart';
 import 'study_set.dart';
 import 'study_session.dart';
 
-// class CardPage {
-//   final String id;
-//   final String question;
-//   final String answer;
+class SetsScreen extends StatefulWidget {
+  final List<StudySet> sets;
 
-//   CardPage({required this.id, required this.question, required this.answer});
-// }
-
-class CardPage extends StatefulWidget {
-  // String setName = '';
-  // String setId = '';
-  final StudySet cardSet;
-
-  const CardPage({super.key, required this.cardSet});
+  const SetsScreen({super.key, required this.sets});
 
   @override
-  State<CardPage> createState() => CardPageState();
+  State<SetsScreen> createState() => _SetsScreenState();
 }
 
-class CardPageState extends State<CardPage> {
-  // int numerOfCards = 0;
-  // List<FlashCard> flashCards = [];
+class _SetsScreenState extends State<SetsScreen> {
+  int numberOfSets = 0;
+  // List<StudySet> sets = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.cardSet.name), centerTitle: true),
+      backgroundColor: Color.fromRGBO(12, 123, 220, 10),
+      appBar: AppBar(title: const Text('Sets')),
       body: Column(
         children: [
           IconButton(
             icon: Icon(Icons.add),
-            alignment: Alignment.center,
             onPressed: () {
               setState(() {
-                widget.cardSet.flashCards.add(
-                  FlashCard(
-                    id: widget.cardSet.flashCards.length.toString(),
-                    question: '',
-                    answer: '',
+                numberOfSets++;
+                widget.sets.add(
+                  StudySet(
+                    id: numberOfSets.toString(),
+                    name: '',
+                    description: '',
+                    flashCards: new List<FlashCard>.empty(growable: true),
                   ),
                 );
               });
             },
           ),
-          //StudySession(setToStudy: widget.cardSet),
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      StudySessionScreen(setToStudy: widget.cardSet),
-                ),
-              );
-            },
-            child: Text("Start Session"),
-          ),
           Expanded(
             child: ListView.builder(
-              itemCount: widget.cardSet.flashCards.length,
+              itemCount: widget.sets.length,
               itemBuilder: (context, index) {
-                return FlashCardWidget(
-                  onDeleteCard: (flashCard) {
+                return SetWidget(
+                  key: ValueKey(widget.sets[index].id),
+                  set: widget.sets[index],
+                  onDelete: (setToDelete) {
                     showDialog(
                       context: context,
                       builder: (BuildContext dialogContext) {
                         return AlertDialog(
                           content: const Text(
-                            'Are you sure you want to delete this flash card?',
+                            'Are you sure you want to delete this set?',
                             style: TextStyle(fontSize: 20),
                             textAlign: TextAlign.center,
                           ),
@@ -87,8 +68,8 @@ class CardPageState extends State<CardPage> {
                             TextButton(
                               onPressed: () {
                                 setState(() {
-                                  widget.cardSet.flashCards.removeWhere(
-                                    (card) => card.id == flashCard.id,
+                                  widget.sets.removeWhere(
+                                    (set_) => set_.id == setToDelete.id,
                                   );
                                 });
                                 Navigator.pop(dialogContext);
@@ -103,8 +84,6 @@ class CardPageState extends State<CardPage> {
                       },
                     );
                   },
-                  flashCard: widget.cardSet.flashCards[index],
-                  key: ValueKey(widget.cardSet.flashCards[index].id),
                 );
               },
             ),
