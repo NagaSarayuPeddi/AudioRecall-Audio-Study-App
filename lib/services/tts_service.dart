@@ -15,4 +15,24 @@ class TTSService {
   Future<void> setSpeechRate(double rate) async {
     await _flutterTts.setSpeechRate(rate);
   }
+
+  Future<void> setVoice(Map<String, String> voice) async {
+    await _flutterTts.setVoice(voice);
+  }
+
+  Future<List<dynamic>> getVoices() async {
+    return await _flutterTts.getVoices;
+  }
+}
+
+class TTSSettings {
+  static double speechRate = 0.5;
+  static Map<String, String>? selectedVoice;
+  static List<Map<String, String>> voices = [];
+
+  static TTSService tts = TTSService();
+
+  static Future<void> loadVoices() async {
+    voices = List<Map<String, String>>.from(await tts.getVoices());
+  }
 }

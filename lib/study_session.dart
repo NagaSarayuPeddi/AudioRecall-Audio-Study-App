@@ -24,8 +24,12 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   bool tap = false;
   bool doubleTap = false;
 
+  // double speechRate = 1.0;
+  // List<dynamic> voices = [];
+  // Map<String, String>? selectedVoice;
+
   final stt = STTService();
-  final tts = TTSService();
+  //final tts = TTSService();
 
   Completer<String>? tapCompleter;
   Completer<String>? answerCompleter;
@@ -35,9 +39,21 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   @override
   void initState() {
     super.initState();
-    tts.setSpeechRate(1);
+    //loadVoices();
+    TTSSettings.tts.setSpeechRate(TTSSettings.speechRate);
     stt.initialize();
   }
+
+  // Future<void> loadVoices() async {
+  //   TTSSettings.voices = await TTSSettings.tts.getVoices();
+
+  //   if (TTSSettings.voices.isNotEmpty) {
+  //     TTSSettings.selectedVoice = TTSSettings.voices.first;
+  //     await TTSSettings.tts.setVoice(TTSSettings.selectedVoice!);
+  //   }
+
+  //   setState(() {});
+  // }
 
   Future<void> startSession() async {
     setState(() {
@@ -45,7 +61,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       currentQuestionIndex = 0;
       bgdColor = Colors.blue;
     });
-    await tts.speak(
+    await TTSSettings.tts.speak(
       'Starting study session for set ${widget.setToStudy.name}.',
     );
 
@@ -168,7 +184,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     if (!isSessionActive) return;
 
     if (currentQuestionIndex >= widget.setToStudy.flashCards.length) {
-      await tts.speak("Congratulations! You finished!");
+      await TTSSettings.tts.speak("Congratulations! You finished!");
       endSession();
       return;
     }
@@ -196,7 +212,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
 
     // stop
     if (userAnswer.contains("stop")) {
-      await tts.speak("Study session ended. Great job!");
+      await TTSSettings.tts.speak("Study session ended. Great job!");
       endSession();
       return;
     }
@@ -206,7 +222,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       setState(() {
         bgdColor = Colors.green;
       });
-      await tts.speak("Correct!");
+      await TTSSettings.tts.speak("Correct!");
 
       currentQuestionIndex++;
       num++;
@@ -219,10 +235,15 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       setState(() {
         bgdColor = Colors.black;
       });
-
-      await tts.speak(
-        "Tap the screen to hear the correct answer, or double tap to keep trying.",
-      );
+      if (userAnswer.contains("don't know")) {
+        await TTSSettings.tts.speak(
+          "No worries, tap the screen to hear the correct answer, or double tap to keep trying.",
+        );
+      } else {
+        await TTSSettings.tts.speak(
+          "Do you need help? Tap the screen to hear the correct answer, or double tap to keep trying.",
+        );
+      }
 
       tapCompleter = Completer<String>();
 
@@ -247,7 +268,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
         bgdColor = Colors.red;
       });
 
-      await tts.speak("Try again!");
+      await TTSSettings.tts.speak("Try again!");
       //await Future.delayed(const Duration(milliseconds: 500));
       runQuestion(true); // retry the same question
     }
@@ -314,7 +335,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   // }
 
   Future<void> endSession() async {
-    tts.stop();
+    TTSSettings.tts.stop();
     await stt.stopListening();
     if (tapCompleter != null && !tapCompleter!.isCompleted) {
       tapCompleter!.complete("cancel");
@@ -329,7 +350,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   Future<void> readQuestion() async {
     String question =
         widget.setToStudy.flashCards[currentQuestionIndex].question;
-    await tts.speak("The correct answer is: $question");
+    await TTSSettings.tts.speak("The correct answer is: $question");
   }
 
   Future<void> readAnswer(int number) async {
@@ -337,7 +358,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     setState(() {
       bgdColor = Colors.black;
     });
-    await tts.speak("Number $number : $answer");
+    await TTSSettings.tts.speak("Number $number : $answer");
     setState(() {
       bgdColor = Colors.white;
     });
@@ -386,7 +407,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
             onPressed: () {
               if (isSessionActive) {
                 endSession();
-                tts.speak('Study session ended. Great job!');
+                TTSSettings.tts.speak('Study session ended. Great job!');
               } else {
                 startSession();
               }

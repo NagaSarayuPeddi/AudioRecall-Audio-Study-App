@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'flash_card.dart';
 import 'study_set.dart';
@@ -7,6 +8,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
+import 'profile_screen.dart';
 //import 'sets_screen.dart';
 
 //final GlobalKey<SetsScreenState> setsScreenKey = GlobalKey<SetsScreenState>();
@@ -164,6 +166,23 @@ class BottomNavBarState extends State<BottomNavBar> {
   //final List<StudySet> finalSets = [];
   final List<StudySet> sets = [];
   int numberOfSets = 0;
+
+  static List<StudySet> initialSets = [];
+
+  @override
+  void initState() {
+    super.initState();
+    initSets();
+  }
+
+  Future<void> initSets() async {
+    await loadInitialSets();
+    setState(() {
+      for (StudySet set in initialSets) {
+        addSet(set);
+      }
+    });
+  }
 
   // late List<Widget> widgetOptions = <Widget>[
   //   HomeScreen(onCreateSetButtonPressed: () => onIconPressed(1)),
@@ -415,6 +434,59 @@ class SetsScreen extends StatelessWidget {
   }
 }
 
+Future<void> loadInitialSets() async {
+  List<String> paths = [
+    "assets/data/computer_science.csv",
+    "assets/data/economics.csv",
+    "assets/data/geography.csv",
+    "assets/data/psychology_terms.csv",
+    "assets/data/sat_vocab.csv",
+  ];
+  List<String> setNames = [
+    "Computer Science",
+    "Economics",
+    "Geography",
+    "Psychology",
+    "SAT Vocabulary",
+  ];
+
+  for (int i = 0; i < paths.length; i++) {
+    StudySet iset = await loadCsvAsStudySet(paths[i], setNames[i]);
+    BottomNavBarState.initialSets.add(iset);
+  }
+}
+
+Future<StudySet> loadCsvAsStudySet(String path, String setName) async {
+  final raw = await rootBundle.loadString(path);
+
+  final cleaned = raw.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+
+  print("RAW CSV:\n$cleaned"); // DEBUG
+
+  final csvTable = const CsvToListConverter(eol: '\n').convert(cleaned);
+
+  print("Parsed rows: ${csvTable.length}");
+
+  List<FlashCard> cards = [];
+
+  for (int i = 1; i < csvTable.length; i++) {
+    if (csvTable[i].length < 2) continue;
+
+    print("Loaded card: ${csvTable[i][0]} - ${csvTable[i][1]}");
+
+    cards.add(
+      FlashCard(
+        id: i.toString(),
+        question: csvTable[i][0].toString(),
+        answer: csvTable[i][1].toString(),
+        isEditing: false,
+      ),
+    );
+  }
+
+  return StudySet(id: "", description: "", name: setName, flashCards: cards);
+}
+
 Future<StudySet?> importCsvAndCreateSet() async {
   FilePickerResult? result = await FilePicker.platform.pickFiles(
     type: FileType.custom,
@@ -462,13 +534,61 @@ Future<StudySet?> importCsvAndCreateSet() async {
   return StudySet(id: "", description: "", name: setName, flashCards: cards);
 }
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return const Text(
-      'Profile Screen',
-      style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-    );
-  }
-}
+// class ProfileScreen extends StatelessWidget {
+//   const ProfileScreen({super.key});
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//         appBar: AppBar(title: Text("Settings"), centerTitle: true),
+//         body: Column(
+//           children: [
+//             DropdownButton<Map<String, String>>(
+//               hint: Text("Select Voice"),
+//               value: selectedVoice,
+//               items: voices.map((voice) {
+//                 final v = Map<String, String>.from(voice);
+//                 return DropdownMenuItem(value: v, child: Text("${v['name']}"));
+//               }).toList(),
+//               onChanged: (voice) async {
+//                 setState(() {
+//                   selectedVoice = voice;
+//                 });
+
+//                 await tts.setVoice(voice!);
+
+//                 await tts.speak("Voice changed to ${voice['name']}");
+//               },
+//             ),
+//             Text("Speed"),
+//             Slider(
+//               value: speechRate,
+//               min: 0.2,
+//               max: 2.0,
+//               divisions: 8,
+//               label: speechRate.toStringAsFixed(2),
+//               onChanged: (value) {
+//                 setState(() {
+//                   speechRate = value;
+//                 });
+//                 tts.setSpeechRate(speechRate);
+//               },
+//             ),
+//             Center(
+//               child: ElevatedButton(
+//                 child: Text(isSessionActive ? 'End Session' : 'Start Session'),
+//                 onPressed: () {
+//                   if (isSessionActive) {
+//                     endSession();
+//                     tts.speak('Study session ended. Great job!');
+//                   } else {
+//                     startSession();
+//                   }
+//                 },
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
