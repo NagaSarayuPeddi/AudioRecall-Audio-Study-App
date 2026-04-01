@@ -59,6 +59,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     setState(() {
       isSessionActive = true;
       currentQuestionIndex = 0;
+      num = 1;
       bgdColor = Colors.blue;
     });
     await TTSSettings.tts.speak(
