@@ -32,27 +32,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(title: Text("Settings"), centerTitle: true),
       body: Column(
         children: [
-          DropdownButton<Map<String, String>>(
-            hint: Text("Select Voice"),
-            value: TTSSettings.selectedVoice,
-            items: TTSSettings.voices.map((voice) {
-              //final v = Map<String, String>.from(voice);
-              return DropdownMenuItem(
-                value: voice,
-                child: Text(voice['name'] ?? 'Unknown'),
-              );
-            }).toList(),
-            onChanged: (voice) async {
-              setState(() {
-                TTSSettings.selectedVoice = voice;
-              });
-
-              await TTSSettings.tts.setVoice(voice!);
-
-              await TTSSettings.tts.speak("Voice changed to ${voice['name']}");
-            },
+          Text(
+            "Voice",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          Text("Speed"),
+          SizedBox(
+            width: 250,
+            child: DropdownButton<Map<String, String>>(
+              isExpanded: true,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+              hint: Text(
+                "Select Voice",
+                //style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              value: TTSSettings.selectedVoice,
+              items: TTSSettings.voices.map((voice) {
+                //final v = Map<String, String>.from(voice);
+                return DropdownMenuItem(
+                  value: voice,
+                  child: Text(
+                    voice['name'] ?? 'Unknown',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                );
+              }).toList(),
+              onChanged: (voice) async {
+                setState(() {
+                  TTSSettings.selectedVoice = voice;
+                });
+
+                await TTSSettings.tts.setVoice(voice!);
+
+                await TTSSettings.tts.speak(
+                  "Voice changed to ${voice['name']}",
+                );
+              },
+            ),
+          ),
+          Text(
+            "Speed",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           Slider(
             value: TTSSettings.speechRate,
             min: 0.2,
@@ -60,6 +88,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             divisions: 8,
             label: TTSSettings.speechRate.toStringAsFixed(2),
             onChanged: (value) {
+              TTSSettings.tts.speak(
+                "Speech rate set to ${value.toStringAsFixed(2)}",
+              );
               setState(() {
                 TTSSettings.speechRate = value;
               });

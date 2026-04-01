@@ -21,7 +21,14 @@ class TTSService {
   }
 
   Future<List<dynamic>> getVoices() async {
-    return await _flutterTts.getVoices;
+    List<dynamic> voices = await _flutterTts.getVoices;
+
+    if (voices.isEmpty) {
+      await Future.delayed(Duration(milliseconds: 500));
+      voices = await _flutterTts.getVoices;
+    }
+
+    return voices;
   }
 }
 
@@ -33,6 +40,21 @@ class TTSSettings {
   static TTSService tts = TTSService();
 
   static Future<void> loadVoices() async {
-    voices = List<Map<String, String>>.from(await tts.getVoices());
+    final List<dynamic> rawVoices = await tts.getVoices();
+
+    if (rawVoices.isEmpty) {
+      await Future.delayed(Duration(seconds: 1));
+    }
+
+    voices = rawVoices.map<Map<String, String>>((voice) {
+      final v = Map<String, String>.from(voice);
+      return {
+        'name': v['name']?.toString() ?? 'Unknown',
+        'locale': v['locale']?.toString() ?? 'Unknown',
+      };
+    }).toList();
+
+    print("Loaded voices: ${voices.length}");
+    print(voices);
   }
 }
