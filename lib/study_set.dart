@@ -298,28 +298,37 @@ class _SetWidgetState extends State<SetWidget> {
                 ],
               ),
               const SizedBox(height: 10),
-              if (widget.set.isEditing)
-                TextButton(onPressed: donePressed, child: const Text('Done'))
-              else
-                Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
+              Row(
+                children: [
+                  if (widget.set.isEditing)
+                    TextButton(
+                      onPressed: donePressed,
+                      child: const Text('Done'),
+                    )
+                  else
+                    const SizedBox(), 
+
+                  Spacer(), // pushes delete to the right
+
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      iconSize: 30,
+                      onPressed: () {
+                        if (widget.onDelete != null) {
+                          widget.onDelete?.call(widget.set);
+                        }
+                      },
+                    ),
                   ),
-                  child: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    iconSize: 30,
-                    onPressed: () {
-                      if (widget.onDelete != null) {
-                        widget.onDelete?.call(
-                          widget.set,
-                        ); // notify parent to delete this set
-                      }
-                    },
-                  ),
-                ),
+                ],
+              ),
             ],
           ),
         ),
