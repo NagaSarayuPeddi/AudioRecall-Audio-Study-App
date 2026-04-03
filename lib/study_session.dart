@@ -23,6 +23,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   Color bgdColor = Colors.white;
   bool tap = false;
   bool doubleTap = false;
+  bool showAnswer = false;
 
   // double speechRate = 1.0;
   // List<dynamic> voices = [];
@@ -225,7 +226,10 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       });
       await TTSSettings.tts.speak("Correct!");
 
-      currentQuestionIndex++;
+      setState(() {
+        currentQuestionIndex++;
+        showAnswer = false;
+      });
       num++;
       await Future.delayed(const Duration(milliseconds: 500));
 
@@ -252,7 +256,10 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
 
       if (action == "tap") {
         await readQuestion();
-        currentQuestionIndex++;
+        setState(() {
+          currentQuestionIndex++;
+          showAnswer = false;
+        });
         num++;
         //await Future.delayed(const Duration(milliseconds: 500));
         runQuestion(false);
@@ -402,18 +409,105 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       child: Scaffold(
         backgroundColor: bgdColor,
         appBar: AppBar(title: Text("Study Session"), centerTitle: true),
-        body: Center(
-          child: ElevatedButton(
-            child: Text(isSessionActive ? 'End Session' : 'Start Session'),
-            onPressed: () {
-              if (isSessionActive) {
-                endSession();
-                TTSSettings.tts.speak('Study session ended. Great job!');
-              } else {
-                startSession();
-              }
-            },
-          ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Studying: ${widget.setToStudy.name}",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 5),
+            Text(
+              "Tap the card to show the answer",
+              style: TextStyle(fontSize: 16),
+            ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  showAnswer = !showAnswer;
+                });
+              },
+              child: Card(
+                margin: EdgeInsets.all(16),
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      showAnswer
+                          ? Text(
+                              widget
+                                  .setToStudy
+                                  .flashCards[currentQuestionIndex]
+                                  .answer,
+                              style: TextStyle(fontSize: 20),
+                              textAlign: TextAlign.center,
+                            )
+                          : Text(
+                              widget
+                                  .setToStudy
+                                  .flashCards[currentQuestionIndex]
+                                  .question,
+                              style: TextStyle(
+                                fontSize: 45,
+                                fontWeight: FontWeight.w900,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            Text(
+              "${currentQuestionIndex + 1} of ${widget.setToStudy.flashCards.length}",
+            ),
+
+            SizedBox(height: 5),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      if (currentQuestionIndex > 0) {
+                        currentQuestionIndex--;
+                        showAnswer = false;
+                      }
+                    });
+                  },
+                  icon: Icon(Icons.arrow_back_ios),
+                ),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      if (currentQuestionIndex <
+                          widget.setToStudy.flashCards.length - 1) {
+                        currentQuestionIndex++;
+                        showAnswer = false;
+                      }
+                    });
+                  },
+                  icon: Icon(Icons.arrow_forward_ios),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 40),
+
+            ElevatedButton(
+              child: Text(isSessionActive ? 'End Session' : 'Start Session'),
+              onPressed: () {
+                if (isSessionActive) {
+                  endSession();
+                  TTSSettings.tts.speak('Study session ended. Great job!');
+                } else {
+                  startSession();
+                }
+              },
+            ),
+          ],
         ),
       ),
     );
