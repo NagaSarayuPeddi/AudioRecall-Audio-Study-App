@@ -67,7 +67,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       num = 1;
       wrongAnswers = 0;
       correctAnswers = 0;
-      attempts = 0;
+      attempts = 1;
       bgdColor = Colors.blue;
     });
     await TTSSettings.tts.speak(
@@ -200,6 +200,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     }
 
     if (!isRetrying) {
+      attempts = 1;
       await readAnswer(num);
     } else {
       attempts++;
@@ -222,6 +223,8 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
         .toLowerCase()
         .trim();
 
+    String secondResponse = "";
+
     // stop
     if (userAnswer.contains("stop")) {
       await TTSSettings.tts.speak("Study session ended. Great job!");
@@ -235,6 +238,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
         bgdColor = Colors.green;
         if (attempts == 1) {
           correctAnswers++;
+          print("correct answers: $correctAnswers");
         }
       });
       await TTSSettings.tts.speak("Correct!");
@@ -248,7 +252,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
 
       runQuestion(false);
     }
-    // no answer is given or they don't know (retry logic also in this)
+    // no answer is given or they don't know
     else if (userAnswer == "" || userAnswer.contains("don't know")) {
       setState(() {
         bgdColor = Colors.black;
@@ -258,22 +262,27 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
           "No worries, do you want to hear the correct answer?",
         );
 
+        Future.delayed(const Duration(seconds: 5));
+
         await stt.listen(
           onResult: (spokenText) async {
-            String response = spokenText.toLowerCase();
-            if (response.contains("yes") || response.contains("sure")) {
-              if (!tapCompleter!.isCompleted) {
-                tapCompleter!.complete("tap");
-              }
-              wrongAnswers++;
-            } else if (response.contains("no") ||
-                response.contains("not now")) {
-              if (!tapCompleter!.isCompleted) {
-                tapCompleter!.complete("double");
-              }
-            }
+            secondResponse = spokenText.toLowerCase();
+            print("Second response: $secondResponse");
           },
         );
+
+        if (secondResponse.contains("yes") || secondResponse.contains("sure")) {
+          if (!tapCompleter!.isCompleted) {
+            tapCompleter!.complete("tap");
+          }
+          wrongAnswers++;
+          print("wrong answers: $wrongAnswers");
+        } else if (secondResponse.contains("no") ||
+            secondResponse.contains("not now")) {
+          if (!tapCompleter!.isCompleted) {
+            tapCompleter!.complete("double");
+          }
+        }
       } else {
         await TTSSettings.tts.speak(
           "Do you need help? Tap the screen to hear the correct answer, or double tap to keep trying.",
@@ -305,6 +314,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       setState(() {
         bgdColor = Colors.red;
         wrongAnswers++;
+        print("wrong answers: $wrongAnswers");
       });
 
       await TTSSettings.tts.speak("Try again!");
@@ -376,9 +386,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   Future<void> endSession() async {
     TTSSettings.tts.stop();
     await stt.stopListening();
-    if (tapCompleter != null && !tapCompleter!.isCompleted) {
-      tapCompleter!.complete("cancel");
-    }
+    //tapCompleter!.complete("cancel");
 
     showSummaryDialog();
     speakSummary();
@@ -409,22 +417,22 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   }
 
   Future<void> speakSummary() async {
+    String response = "";
     await TTSSettings.tts.speak("Do you want to hear your session summary?");
-    Future.delayed(const Duration(seconds: 1));
+    Future.delayed(const Duration(seconds: 6));
     await stt.listen(
       onResult: (spokenText) async {
-        String response = spokenText.toLowerCase();
-        if (response.contains("yes") || response.contains("sure")) {
-          if (!tapCompleter!.isCompleted) {
-            await TTSSettings.tts.speak(
-              "You got $correctAnswers correct and $wrongAnswers wrong out of ${widget.setToStudy.flashCards.length} questions.",
-            );
-          }
-        } else {
-          await TTSSettings.tts.speak("Okay. Bye!");
-        }
+        response = spokenText.toLowerCase().trim();
       },
     );
+
+    if (response.contains("yes") || response.contains("sure")) {
+      await TTSSettings.tts.speak(
+        "You got $correctAnswers correct and $wrongAnswers wrong out of ${widget.setToStudy.flashCards.length} flashcards.",
+      );
+    } else {
+      await TTSSettings.tts.speak("Okay. Bye!");
+    }
   }
 
   void showSummaryDialog() {
