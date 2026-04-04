@@ -25,6 +25,10 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   bool doubleTap = false;
   bool showAnswer = false;
 
+  int correctAnswers = 0;
+  int wrongAnswers = 0;
+  int attempts = 0;
+
   // double speechRate = 1.0;
   // List<dynamic> voices = [];
   // Map<String, String>? selectedVoice;
@@ -61,6 +65,9 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       isSessionActive = true;
       currentQuestionIndex = 0;
       num = 1;
+      wrongAnswers = 0;
+      correctAnswers = 0;
+      attempts = 0;
       bgdColor = Colors.blue;
     });
     await TTSSettings.tts.speak(
@@ -187,12 +194,15 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
 
     if (currentQuestionIndex >= widget.setToStudy.flashCards.length) {
       await TTSSettings.tts.speak("Congratulations! You finished!");
+      await speakSummary();
       endSession();
       return;
     }
 
     if (!isRetrying) {
       await readAnswer(num);
+    } else {
+      attempts++;
     }
 
     setState(() {
@@ -223,6 +233,9 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     if (userAnswer == expectedAnswer) {
       setState(() {
         bgdColor = Colors.green;
+        if (attempts == 1) {
+          correctAnswers++;
+        }
       });
       await TTSSettings.tts.speak("Correct!");
 
@@ -242,7 +255,24 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       });
       if (userAnswer.contains("don't know")) {
         await TTSSettings.tts.speak(
-          "No worries, tap the screen to hear the correct answer, or double tap to keep trying.",
+          "No worries, do you want to hear the correct answer?",
+        );
+
+        await stt.listen(
+          onResult: (spokenText) async {
+            String response = spokenText.toLowerCase();
+            if (response.contains("yes") || response.contains("sure")) {
+              if (!tapCompleter!.isCompleted) {
+                tapCompleter!.complete("tap");
+              }
+              wrongAnswers++;
+            } else if (response.contains("no") ||
+                response.contains("not now")) {
+              if (!tapCompleter!.isCompleted) {
+                tapCompleter!.complete("double");
+              }
+            }
+          },
         );
       } else {
         await TTSSettings.tts.speak(
@@ -274,6 +304,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     else {
       setState(() {
         bgdColor = Colors.red;
+        wrongAnswers++;
       });
 
       await TTSSettings.tts.speak("Try again!");
@@ -348,6 +379,10 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     if (tapCompleter != null && !tapCompleter!.isCompleted) {
       tapCompleter!.complete("cancel");
     }
+
+    showSummaryDialog();
+    speakSummary();
+
     setState(() {
       isSessionActive = false;
       isListening = false;
@@ -359,6 +394,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     String question =
         widget.setToStudy.flashCards[currentQuestionIndex].question;
     await TTSSettings.tts.speak("The correct answer is: $question");
+    attempts = 1;
   }
 
   Future<void> readAnswer(int number) async {
@@ -370,6 +406,45 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     setState(() {
       bgdColor = Colors.white;
     });
+  }
+
+  Future<void> speakSummary() async {
+    await TTSSettings.tts.speak("Do you want to hear your session summary?");
+    Future.delayed(const Duration(seconds: 1));
+    await stt.listen(
+      onResult: (spokenText) async {
+        String response = spokenText.toLowerCase();
+        if (response.contains("yes") || response.contains("sure")) {
+          if (!tapCompleter!.isCompleted) {
+            await TTSSettings.tts.speak(
+              "You got $correctAnswers correct and $wrongAnswers wrong out of ${widget.setToStudy.flashCards.length} questions.",
+            );
+          }
+        } else {
+          await TTSSettings.tts.speak("Okay. Bye!");
+        }
+      },
+    );
+  }
+
+  void showSummaryDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Session Summary"),
+          content: Text(
+            "Correct: $correctAnswers\nWrong: $wrongAnswers\nTotal: ${widget.setToStudy.flashCards.length}",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("Close"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -421,6 +496,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
               "Tap the card to show the answer",
               style: TextStyle(fontSize: 16),
             ),
+            SizedBox(height: 30),
             GestureDetector(
               onTap: () {
                 setState(() {
@@ -439,7 +515,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                                   .setToStudy
                                   .flashCards[currentQuestionIndex]
                                   .answer,
-                              style: TextStyle(fontSize: 20),
+                              style: TextStyle(fontSize: 30),
                               textAlign: TextAlign.center,
                             )
                           : Text(
@@ -448,7 +524,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                                   .flashCards[currentQuestionIndex]
                                   .question,
                               style: TextStyle(
-                                fontSize: 45,
+                                fontSize: 65,
                                 fontWeight: FontWeight.w900,
                               ),
                               textAlign: TextAlign.center,
@@ -461,6 +537,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
 
             Text(
               "${currentQuestionIndex + 1} of ${widget.setToStudy.flashCards.length}",
+              style: TextStyle(fontSize: 25),
             ),
 
             SizedBox(height: 5),
@@ -494,7 +571,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
               ],
             ),
 
-            SizedBox(height: 40),
+            SizedBox(height: 10),
 
             ElevatedButton(
               child: Text(isSessionActive ? 'End Session' : 'Start Session'),
@@ -506,6 +583,30 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                   startSession();
                 }
               },
+            ),
+            SizedBox(height: 30),
+
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  LinearProgressIndicator(
+                    value:
+                        (currentQuestionIndex + 1) /
+                        widget.setToStudy.flashCards.length,
+                    minHeight: 10,
+                    backgroundColor: Colors.grey[300],
+                    color: Colors.blue,
+                  ),
+
+                  SizedBox(height: 8),
+
+                  Text(
+                    "${(((currentQuestionIndex + 1) / widget.setToStudy.flashCards.length) * 100).round()}% completed",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
