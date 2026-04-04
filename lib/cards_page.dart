@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:google_fonts/google_fonts.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'flash_card.dart';
 import 'study_set.dart';
 import 'study_session.dart';
@@ -33,20 +33,64 @@ class CardPageState extends State<CardPage> {
       appBar: AppBar(title: Text(widget.cardSet.name), centerTitle: true),
       body: Column(
         children: [
-          IconButton(
-            icon: Icon(Icons.add),
-            alignment: Alignment.center,
-            onPressed: () {
-              setState(() {
-                widget.cardSet.flashCards.add(
-                  FlashCard(
-                    id: widget.cardSet.flashCards.length.toString(),
-                    question: '',
-                    answer: '',
+          //     IconButton(
+          //    icon: Icon(Icons.add),
+          //  alignment: Alignment.center,
+          //   onPressed: () {
+          //     setState(() {
+          //       widget.cardSet.flashCards.add(
+          //         FlashCard(
+          //            id: widget.cardSet.flashCards.length.toString(),
+          //            question: '',
+          //            answer: '',
+          //          ),
+          //        );
+          //      });
+          //    },
+          //   ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.add),
+                iconSize: 30,
+                onPressed: () {
+                  setState(() {
+                    widget.cardSet.flashCards.add(
+                      FlashCard(
+                        id: widget.cardSet.flashCards.length.toString(),
+                        question: '',
+                        answer: '',
+                      ),
+                    );
+                  });
+                },
+              ),
+
+              const SizedBox(width: 8),
+
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    widget.cardSet.flashCards.add(
+                      FlashCard(
+                        id: widget.cardSet.flashCards.length.toString(),
+                        question: '',
+                        answer: '',
+                      ),
+                    );
+                  });
+                },
+                child: Text(
+                  "Add Card",
+                  style: GoogleFonts.poppins(
+                    textStyle: Theme.of(context).textTheme.titleMedium,
+                    color: Theme.of(context).colorScheme.secondary,
+                    fontSize: 20,
                   ),
-                );
-              });
-            },
+                ),
+              ),
+            ],
           ),
           //StudySession(setToStudy: widget.cardSet),
           TextButton(
@@ -59,7 +103,21 @@ class CardPageState extends State<CardPage> {
                 ),
               );
             },
-            child: Text("Start Session"),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              "Start Session",
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           Expanded(
             child: ListView.builder(

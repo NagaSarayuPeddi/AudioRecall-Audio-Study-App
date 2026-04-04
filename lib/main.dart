@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
           titleMedium: GoogleFonts.poppins(
             fontSize: 40,
             fontWeight: FontWeight.bold,
-            color: Color.fromRGBO(12, 123, 220, 10),
+            color: Color.fromRGBO(12, 123, 220, 1),
           ),
           bodyMedium: GoogleFonts.poppins(),
           displaySmall: GoogleFonts.poppins(color: Colors.black, fontSize: 24),
@@ -77,7 +77,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(12, 123, 220, 10),
+      backgroundColor: Color.fromRGBO(12, 123, 220, 1),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Center(
@@ -100,42 +100,47 @@ class HomeScreen extends StatelessWidget {
               SizedBox(width: 40, height: 40),
               Divider(
                 // Horizontal line separator
-                color: const Color.fromRGBO(255, 194, 10, 10),
+                color: const Color.fromRGBO(255, 194, 10, 1),
                 thickness: 3, // Line thickness
                 indent: 16, // Space at the start of the line
                 endIndent: 16, // Space at the end of the line
               ),
               SizedBox(width: 40, height: 40),
               ElevatedButton(
-                onPressed: onCreateSetButtonPressed,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(
-                    255,
-                    194,
-                    10,
-                    10,
-                  ), // Background color
-                  foregroundColor: Colors.white, // Text/icon color
-                  shadowColor: Colors.black, // Shadow color
-                  elevation: 10.0,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 60,
-                  ),
-                ),
-                child: Text(
-                  "Create New Set",
-                  style: GoogleFonts.poppins(
-                    textStyle: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-              ),
-              ElevatedButton(
                 onPressed: () async {
                   StudySet? nSet = await importCsvAndCreateSet();
                   if (nSet != null) {
                     onAddSet(nSet);
                   }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(
+                    255,
+                    194,
+                    10,
+                    1,
+                  ), // fixed opacity
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.black,
+                  elevation: 10.0,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 60, 
+                  ),
+                ),
+                child: Text(
+                  "Import CSV",
+                  style: GoogleFonts.poppins(
+                    textStyle: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+              ),
+           //   ElevatedButton(
+               // onPressed: () async {
+           //       StudySet? nSet = await importCsvAndCreateSet();
+            //      if (nSet != null) {
+            //        onAddSet(nSet);
+             //     }
                   // setState(() {
                   //   setsScreenKey.currentState?.addSet(nSet!);
                   //   print(setsScreenKey.currentState?.sets.length);
@@ -143,9 +148,9 @@ class HomeScreen extends StatelessWidget {
                   //       .findAncestorStateOfType<BottomNavBarState>();
                   //   navBarState?.onIconPressed(1);
                   // });
-                },
-                child: Text("Import CSV"),
-              ),
+             //   },
+      //          child: Text("Import CSV"),
+       //       ),
             ],
           ),
         ),
