@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:google_fonts/google_fonts.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'services/stt_service.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
@@ -161,10 +161,13 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                                   hintText: 'Enter the answer',
                                   labelText: 'Answer',
                                 ),
-                              )
-                            : Text(
-                                widget.flashCard.answer,
-                                style: Theme.of(context).textTheme.displaySmall,
+                              ):
+                              Text(
+                                 widget.flashCard.answer,
+                                 style: GoogleFonts.poppins(
+                                 fontSize: 20,              
+                                 color: const Color.fromARGB(255, 0, 0, 0),
+                                 ),
                               ),
                       ),
                       GestureDetector(
@@ -218,7 +221,11 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                 } else {
                   return Text(
                     widget.flashCard.answer,
-                    style: Theme.of(context).textTheme.displaySmall,
+                    //style: Theme.of(context).textTheme.displaySmall,
+                    style: GoogleFonts.poppins(
+                    fontSize: 20,              
+                    color: const Color.fromARGB(255, 0, 0, 0),
+                    ),  
                   );
                 }
               },
