@@ -1,6 +1,8 @@
 //import 'cards_page.dart';
 import 'study_set.dart';
 //import 'flash_card.dart';
+import 'main.dart';
+import 'profile_screen.dart';
 import 'services/stt_service.dart';
 import 'services/tts_service.dart';
 import 'package:flutter/material.dart';
@@ -500,7 +502,44 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       },
       child: Scaffold(
         backgroundColor: bgdColor,
-        appBar: AppBar(title: Text("Study Session"), centerTitle: true),
+
+        /// appBar: AppBar(title: Text("Study Session"), centerTitle: true),
+        appBar: AppBar(
+          title: Text("Study Session"),
+          centerTitle: true,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 15,
+                  ),
+                  backgroundColor: Colors.white, // makes it pop on AppBar
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                icon: const Icon(Icons.settings, size: 24),
+                label: const Text(
+                  "Settings",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          const ProfileScreen(), // <-- your settings screen
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -594,15 +633,13 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                 padding: const EdgeInsets.symmetric(
                   horizontal: 50,
                   vertical: 20,
-                ), 
+                ),
                 textStyle: const TextStyle(
-                  fontSize: 24, 
+                  fontSize: 24,
                   fontWeight: FontWeight.bold, // bold text
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    15,
-                  )
+                  borderRadius: BorderRadius.circular(15),
                 ),
               ),
               child: Text(isSessionActive ? 'End Session' : 'Start Session'),

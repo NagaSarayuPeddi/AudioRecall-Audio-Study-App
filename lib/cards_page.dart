@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'flash_card.dart';
+import 'profile_screen.dart';
 import 'study_set.dart';
 import 'study_session.dart';
 
@@ -30,7 +31,44 @@ class CardPageState extends State<CardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.cardSet.name), centerTitle: true),
+      // appBar: AppBar(title: Text(widget.cardSet.name), centerTitle: true),
+      appBar: AppBar(
+        title: Text(widget.cardSet.name),
+        centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 15,
+                ),
+                backgroundColor: Colors.white, // makes it pop on AppBar
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              icon: const Icon(Icons.settings, size: 24),
+              label: const Text(
+                "Settings",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                // Direct navigation to your settings/profile page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const ProfileScreen(), // <-- replace if your class is different
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           //     IconButton(
