@@ -144,7 +144,7 @@ class HomeScreen extends StatelessWidget {
 
                   String topic = await STTService().listenOnce();
 
-                  await Future.delayed(const Duration(seconds: 5));
+                  await Future.delayed(const Duration(milliseconds: 500));
 
                   if (topic.isEmpty) return;
 
@@ -287,7 +287,10 @@ class BottomNavBarState extends State<BottomNavBar> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.book), label: "Sets"),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: "Settings",
+          ),
         ],
       ),
     );
