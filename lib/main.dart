@@ -3,15 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'flash_card.dart';
 import 'study_set.dart';
-import 'services/stt_service.dart';
-import 'dart:io';
 import 'dart:convert';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'profile_screen.dart';
-//import 'sets_screen.dart';
-
-//final GlobalKey<SetsScreenState> setsScreenKey = GlobalKey<SetsScreenState>();
+import 'services/ai_service.dart';
+import 'services/tts_service.dart';
+import 'services/stt_service.dart';
 
 void main() {
   //GoogleFonts.config.allowRuntimeFetching = false;
@@ -125,7 +123,7 @@ class HomeScreen extends StatelessWidget {
                   elevation: 10.0,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 40,
-                    vertical: 60, 
+                    vertical: 60,
                   ),
                 ),
                 child: Text(
@@ -135,22 +133,57 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-           //   ElevatedButton(
-               // onPressed: () async {
-           //       StudySet? nSet = await importCsvAndCreateSet();
-            //      if (nSet != null) {
-            //        onAddSet(nSet);
-             //     }
-                  // setState(() {
-                  //   setsScreenKey.currentState?.addSet(nSet!);
-                  //   print(setsScreenKey.currentState?.sets.length);
-                  //   BottomNavBarState? navBarState = context
-                  //       .findAncestorStateOfType<BottomNavBarState>();
-                  //   navBarState?.onIconPressed(1);
-                  // });
-             //   },
-      //          child: Text("Import CSV"),
-       //       ),
+              SizedBox(height: 20),
+
+              ElevatedButton(
+                onPressed: () async {
+                  await TTSSettings.tts.speak(
+                    "What's the topic you want to study?",
+                  );
+                  await Future.delayed(const Duration(milliseconds: 500));
+
+                  String topic = await STTService().listenOnce();
+
+                  await Future.delayed(const Duration(seconds: 5));
+
+                  if (topic.isEmpty) return;
+
+                  await TTSSettings.tts.speak(
+                    "How many flashcards do you want in your set?",
+                  );
+
+                  await Future.delayed(const Duration(milliseconds: 500));
+
+                  String num = await STTService().listenOnce();
+
+                  await Future.delayed(const Duration(seconds: 2));
+
+                  StudySet? newSet = await AIService.generateStudySet(
+                    topic,
+                    num,
+                  );
+                  if (newSet != null) {
+                    onAddSet(newSet);
+                  }
+                },
+                child: Text("Generate with AI"),
+              ),
+              //   ElevatedButton(
+              // onPressed: () async {
+              //       StudySet? nSet = await importCsvAndCreateSet();
+              //      if (nSet != null) {
+              //        onAddSet(nSet);
+              //     }
+              // setState(() {
+              //   setsScreenKey.currentState?.addSet(nSet!);
+              //   print(setsScreenKey.currentState?.sets.length);
+              //   BottomNavBarState? navBarState = context
+              //       .findAncestorStateOfType<BottomNavBarState>();
+              //   navBarState?.onIconPressed(1);
+              // });
+              //   },
+              //          child: Text("Import CSV"),
+              //       ),
             ],
           ),
         ),

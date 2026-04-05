@@ -33,11 +33,11 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   // List<dynamic> voices = [];
   // Map<String, String>? selectedVoice;
 
-  final stt = STTService();
+  //final stt = STTService();
   //final tts = TTSService();
 
   Completer<String>? tapCompleter;
-  Completer<String>? answerCompleter;
+  // Completer<String>? answerCompleter;
 
   bool isListening = false;
 
@@ -46,7 +46,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     super.initState();
     //loadVoices();
     TTSSettings.tts.setSpeechRate(TTSSettings.speechRate);
-    stt.initialize();
+    STTService().initialize();
   }
 
   // Future<void> loadVoices() async {
@@ -152,42 +152,42 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     // }
   }
 
-  Future<String> listenOnce() async {
-    String resultText = "";
-    String lastWords = "";
+  // Future<String> listenOnce() async {
+  //   String resultText = "";
+  //   String lastWords = "";
 
-    answerCompleter = Completer<String>();
+  //   answerCompleter = Completer<String>();
 
-    Timer? silenceTimer;
+  //   Timer? silenceTimer;
 
-    await stt.listen(
-      onResult: (spokenText) {
-        lastWords = spokenText;
-        silenceTimer?.cancel();
-        silenceTimer = Timer(const Duration(seconds: 1), () {
-          if (!answerCompleter!.isCompleted) {
-            answerCompleter!.complete(lastWords);
-          }
-        });
-      },
-    );
+  //   await stt.listen(
+  //     onResult: (spokenText) {
+  //       lastWords = spokenText;
+  //       silenceTimer?.cancel();
+  //       silenceTimer = Timer(const Duration(seconds: 1), () {
+  //         if (!answerCompleter!.isCompleted) {
+  //           answerCompleter!.complete(lastWords);
+  //         }
+  //       });
+  //     },
+  //   );
 
-    //await Future.delayed(Duration(seconds: 2));
-    try {
-      resultText = await answerCompleter!.future.timeout(
-        Duration(seconds: 5),
-      ); // max wait time
-    } catch (e) {
-      resultText = lastWords;
-    }
-    //esultText = await answerCompleter!.future.timeout(Duration(seconds: 10));
-    print("Recognized speech: $resultText");
-    await stt.stopListening();
+  //   //await Future.delayed(Duration(seconds: 2));
+  //   try {
+  //     resultText = await answerCompleter!.future.timeout(
+  //       Duration(seconds: 5),
+  //     ); // max wait time
+  //   } catch (e) {
+  //     resultText = lastWords;
+  //   }
+  //   //esultText = await answerCompleter!.future.timeout(Duration(seconds: 10));
+  //   print("Recognized speech: $resultText");
+  //   await stt.stopListening();
 
-    //await Future.delayed(Duration(milliseconds: 500));
+  //   //await Future.delayed(Duration(milliseconds: 500));
 
-    return resultText.toLowerCase().trim();
-  }
+  //   return resultText.toLowerCase().trim();
+  // }
 
   Future<void> runQuestion(bool isRetrying) async {
     if (!isSessionActive) return;
@@ -210,7 +210,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       bgdColor = Colors.blue;
     });
 
-    String userAnswer = await listenOnce();
+    String userAnswer = await STTService().listenOnce();
 
     if (!isSessionActive) return;
 
@@ -271,7 +271,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
           bgdColor = Colors.blue;
         });
 
-        String yesOrNo = await listenOnce();
+        String yesOrNo = await STTService().listenOnce();
         print("Yes or No response: $yesOrNo");
 
         if (yesOrNo.contains("yes") || yesOrNo.contains("sure")) {
@@ -396,7 +396,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
 
   Future<void> endSession() async {
     TTSSettings.tts.stop();
-    await stt.stopListening();
+    await STTService().stopListening();
     if (tapCompleter != null && !tapCompleter!.isCompleted) {
       tapCompleter!.complete("cancel");
     }
@@ -433,7 +433,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     await TTSSettings.tts.speak("Do you want to hear your session summary?");
     await Future.delayed(const Duration(seconds: 2));
 
-    String response = await listenOnce();
+    String response = await STTService().listenOnce();
 
     if (response.contains("yes") || response.contains("sure")) {
       await TTSSettings.tts.speak(

@@ -216,9 +216,9 @@ class _SetWidgetState extends State<SetWidget> {
                       children: [
                         Expanded(
                           child: Text(
-                          widget.set.name,
-                          style: Theme.of(context).textTheme.titleLarge,
-                         )
+                            widget.set.name,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete),
