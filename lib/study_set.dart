@@ -220,11 +220,27 @@ class _SetWidgetState extends State<SetWidget> {
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () {
-                            widget.onDelete(widget.set);
-                          },
+                      //  IconButton(
+                     ///     icon: const Icon(Icons.delete, color: Colors.red),
+                      //    iconSize: 30,
+                     ///     onPressed: () {
+                     //       widget.onDelete.call(widget.set);
+                     //     },
+                   //     ),
+                        Container(
+                          width: 70,
+                          height: 70,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            iconSize: 30,
+                            onPressed: () {
+                                widget.onDelete.call(widget.set);
+                              }
+                          ),
                         ),
                       ],
                     );
@@ -326,25 +342,7 @@ class _SetWidgetState extends State<SetWidget> {
                   else
                     const SizedBox(),
 
-                  Spacer(), // pushes delete to the right
-
-                  Container(
-                    width: 70,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      iconSize: 30,
-                      onPressed: () {
-                        if (widget.onDelete != null) {
-                          widget.onDelete?.call(widget.set);
-                        }
-                      },
-                    ),
-                  ),
+           //       Spacer(), // pushes delete to the right
                 ],
               ),
             ],

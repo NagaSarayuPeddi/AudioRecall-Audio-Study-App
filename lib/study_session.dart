@@ -506,12 +506,12 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
           children: [
             Text(
               "Studying: ${widget.setToStudy.name}",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 33, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 5),
             Text(
               "Tap the card to show the answer",
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 26),
             ),
             SizedBox(height: 30),
             GestureDetector(
@@ -589,8 +589,22 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
             ),
 
             SizedBox(height: 10),
-
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 50,
+                  vertical: 20,
+                ), 
+                textStyle: const TextStyle(
+                  fontSize: 24, 
+                  fontWeight: FontWeight.bold, // bold text
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                    15,
+                  )
+                ),
+              ),
               child: Text(isSessionActive ? 'End Session' : 'Start Session'),
               onPressed: () {
                 if (isSessionActive) {

@@ -111,7 +111,7 @@ class CardPageState extends State<CardPage> {
               ),
             ),
             child: Text(
-              "Start Session",
+              "Go to Study Session",
               style: GoogleFonts.poppins(
                 fontSize: 20,
                 color: Colors.white,
