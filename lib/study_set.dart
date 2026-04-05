@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:google_fonts/google_fonts.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'flash_card.dart';
 import 'cards_page.dart';
 import 'services/stt_service.dart';
@@ -23,7 +23,8 @@ class StudySet {
 
 class SetWidget extends StatefulWidget {
   final StudySet set;
-  final void Function(StudySet set)? onDelete;
+  // final void Function(StudySet set)? onDelete;
+  final void Function(StudySet set) onDelete;
 
   const SetWidget({super.key, required this.set, required this.onDelete});
 
@@ -206,9 +207,26 @@ class _SetWidgetState extends State<SetWidget> {
                       ],
                     );
                   } else {
-                    return Text(
-                      widget.set.name,
-                      style: Theme.of(context).textTheme.titleLarge,
+                    // return Text(
+                    //   widget.set.name,
+                    //   style: Theme.of(context).textTheme.titleLarge,
+                    //   );
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                          widget.set.name,
+                          style: Theme.of(context).textTheme.titleLarge,
+                         )
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () {
+                            widget.onDelete(widget.set);
+                          },
+                        ),
+                      ],
                     );
                   }
                 },
@@ -306,7 +324,7 @@ class _SetWidgetState extends State<SetWidget> {
                       child: const Text('Done'),
                     )
                   else
-                    const SizedBox(), 
+                    const SizedBox(),
 
                   Spacer(), // pushes delete to the right
 
