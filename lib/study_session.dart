@@ -21,8 +21,8 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   int currentQuestionIndex = 0;
   int num = 1;
   Color bgdColor = Colors.white;
-  bool tap = false;
-  bool doubleTap = false;
+  // bool tap = false;
+  // bool doubleTap = false;
   bool showAnswer = false;
 
   int correctAnswers = 0;
@@ -74,7 +74,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       'Starting study session for set ${widget.setToStudy.name}.',
     );
 
-    runQuestion(false);
+    await runQuestion(false);
     // await readAnswer();
     // await Future.delayed(const Duration(milliseconds: 500));
     //startListening();
@@ -212,6 +212,8 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
 
     String userAnswer = await listenOnce();
 
+    if (!isSessionActive) return;
+
     await handleAnswer(userAnswer);
   }
 
@@ -223,7 +225,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
         .toLowerCase()
         .trim();
 
-    String secondResponse = "";
+    //String secondResponse = "";
 
     // stop
     if (userAnswer.contains("stop")) {
@@ -233,7 +235,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     }
 
     // answer is correct
-    if (userAnswer == expectedAnswer) {
+    if (userAnswer.trim() == expectedAnswer) {
       setState(() {
         bgdColor = Colors.green;
         if (attempts == 1) {
@@ -250,7 +252,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       num++;
       await Future.delayed(const Duration(milliseconds: 500));
 
-      runQuestion(false);
+      await runQuestion(false);
     }
     // no answer is given or they don't know
     else if (userAnswer == "" || userAnswer.contains("don't know")) {
@@ -262,26 +264,33 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
           "No worries, do you want to hear the correct answer?",
         );
 
-        Future.delayed(const Duration(seconds: 5));
+        //await Future.delayed(const Duration(seconds: 5));
+        await Future.delayed(const Duration(milliseconds: 500));
 
-        await stt.listen(
-          onResult: (spokenText) async {
-            secondResponse = spokenText.toLowerCase();
-            print("Second response: $secondResponse");
-          },
-        );
+        setState(() {
+          bgdColor = Colors.blue;
+        });
 
-        if (secondResponse.contains("yes") || secondResponse.contains("sure")) {
-          if (!tapCompleter!.isCompleted) {
-            tapCompleter!.complete("tap");
-          }
+        String yesOrNo = await listenOnce();
+        print("Yes or No response: $yesOrNo");
+
+        if (yesOrNo.contains("yes") || yesOrNo.contains("sure")) {
+          await readQuestion();
           wrongAnswers++;
           print("wrong answers: $wrongAnswers");
-        } else if (secondResponse.contains("no") ||
-            secondResponse.contains("not now")) {
-          if (!tapCompleter!.isCompleted) {
-            tapCompleter!.complete("double");
-          }
+
+          setState(() {
+            currentQuestionIndex++;
+            showAnswer = false;
+          });
+          num++;
+          await Future.delayed(const Duration(milliseconds: 500));
+
+          await runQuestion(false);
+        } else {
+          await TTSSettings.tts.speak("Okay, let's try that one again.");
+          await Future.delayed(const Duration(milliseconds: 500));
+          await runQuestion(true);
         }
       } else {
         await TTSSettings.tts.speak(
@@ -301,10 +310,12 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
         });
         num++;
         //await Future.delayed(const Duration(milliseconds: 500));
-        runQuestion(false);
+        await runQuestion(false);
       } else if (action == "double") {
         //await Future.delayed(const Duration(milliseconds: 500));
-        runQuestion(true); // this will retry without repeating the definition
+        await runQuestion(
+          true,
+        ); // this will retry without repeating the definition
       } else if (action == "cancel") {
         return;
       }
@@ -319,7 +330,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
 
       await TTSSettings.tts.speak("Try again!");
       //await Future.delayed(const Duration(milliseconds: 500));
-      runQuestion(true); // retry the same question
+      await runQuestion(true); // retry the same question
     }
   }
 
@@ -386,7 +397,9 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   Future<void> endSession() async {
     TTSSettings.tts.stop();
     await stt.stopListening();
-    //tapCompleter!.complete("cancel");
+    if (tapCompleter != null && !tapCompleter!.isCompleted) {
+      tapCompleter!.complete("cancel");
+    }
 
     showSummaryDialog();
     speakSummary();
@@ -417,14 +430,10 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   }
 
   Future<void> speakSummary() async {
-    String response = "";
     await TTSSettings.tts.speak("Do you want to hear your session summary?");
-    Future.delayed(const Duration(seconds: 6));
-    await stt.listen(
-      onResult: (spokenText) async {
-        response = spokenText.toLowerCase().trim();
-      },
-    );
+    await Future.delayed(const Duration(seconds: 2));
+
+    String response = await listenOnce();
 
     if (response.contains("yes") || response.contains("sure")) {
       await TTSSettings.tts.speak(
@@ -442,7 +451,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
         return AlertDialog(
           title: Text("Session Summary"),
           content: Text(
-            "Correct: $correctAnswers\nWrong: $wrongAnswers\nTotal: ${widget.setToStudy.flashCards.length}",
+            "Correct: $correctAnswers\nWrong: $wrongAnswers\nTotal: ${wrongAnswers + correctAnswers}",
           ),
           actions: [
             TextButton(
@@ -476,8 +485,8 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
           tapCompleter!.complete("tap");
         }
         setState(() {
-          tap = true;
-          doubleTap = false;
+          // tap = true;
+          // doubleTap = false;
         });
       },
       onDoubleTap: () {
@@ -485,8 +494,8 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
           tapCompleter!.complete("double");
         }
         setState(() {
-          doubleTap = true;
-          tap = false;
+          // doubleTap = true;
+          // tap = false;
         });
       },
       child: Scaffold(
@@ -594,26 +603,32 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
             ),
             SizedBox(height: 30),
 
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  LinearProgressIndicator(
-                    value:
-                        (currentQuestionIndex + 1) /
-                        widget.setToStudy.flashCards.length,
-                    minHeight: 10,
-                    backgroundColor: Colors.grey[300],
-                    color: Colors.blue,
-                  ),
+            Container(
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    LinearProgressIndicator(
+                      value:
+                          (currentQuestionIndex + 1) /
+                          widget.setToStudy.flashCards.length,
+                      minHeight: 10,
+                      backgroundColor: Colors.grey[300],
+                      color: Colors.blue,
+                    ),
 
-                  SizedBox(height: 8),
+                    SizedBox(height: 8),
 
-                  Text(
-                    "${(((currentQuestionIndex + 1) / widget.setToStudy.flashCards.length) * 100).round()}% completed",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ],
+                    Text(
+                      "${(((currentQuestionIndex + 1) / widget.setToStudy.flashCards.length) * 100).round()}% completed",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
