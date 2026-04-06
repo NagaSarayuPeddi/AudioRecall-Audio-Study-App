@@ -60,6 +60,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: const Color(0xFFFDB366),
       margin: const EdgeInsets.all(10),
       child: Padding(
         padding: const EdgeInsets.all(15.0),
@@ -76,10 +77,21 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                       Expanded(
                         child: TextField(
                           controller: questionController,
-                          decoration: const InputDecoration(
+                          style: const TextStyle(
+                            color: Color(0xFF364B9A), // navy text
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                          decoration: InputDecoration(
                             border: OutlineInputBorder(),
                             hintText: 'Enter a question',
+                            hintStyle: const TextStyle(
+                              color: Color(0xFF364B9A),
+                            ),
                             labelText: 'Question',
+                            labelStyle: const TextStyle(
+                              color: Color(0xFF364B9A),
+                            ),
                           ),
                         ),
                         // Text(
@@ -136,7 +148,11 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                 } else {
                   return Text(
                     widget.flashCard.question,
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: const TextStyle(
+                      color: Color(0xFF364B9A), // navy
+                      fontSize: 26,
+                      fontWeight: FontWeight.w900,
+                    ),
                   );
                 }
               },
@@ -156,18 +172,25 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                         child: widget.flashCard.isEditing
                             ? TextField(
                                 controller: answerController,
+                                style: const TextStyle(
+                                  color: Color(0xFF364B9A), // navy
+                                  fontSize: 18,
+                                ),
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
                                   hintText: 'Enter the answer',
+                                  hintStyle: TextStyle(color: Color(0xFF364B9A)),
                                   labelText: 'Answer',
+                                  labelStyle:  TextStyle(color: Color(0xFF364B9A)),
+
                                 ),
-                              ):
-                              Text(
-                                 widget.flashCard.answer,
-                                 style: GoogleFonts.poppins(
-                                 fontSize: 20,              
-                                 color: const Color.fromARGB(255, 0, 0, 0),
-                                 ),
+                              )
+                            : Text(
+                                widget.flashCard.answer,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 20,
+                                  color: const Color(0xFF364B9A),
+                                ),
                               ),
                       ),
                       GestureDetector(
@@ -223,9 +246,9 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                     widget.flashCard.answer,
                     //style: Theme.of(context).textTheme.displaySmall,
                     style: GoogleFonts.poppins(
-                    fontSize: 20,              
-                    color: const Color.fromARGB(255, 0, 0, 0),
-                    ),  
+                      fontSize: 20,
+                      color: const Color(0xFF364B9A),
+                    ),
                   );
                 }
               },

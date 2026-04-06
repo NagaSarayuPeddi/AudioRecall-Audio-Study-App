@@ -217,7 +217,11 @@ class _SetWidgetState extends State<SetWidget> {
                         Expanded(
                           child: Text(
                             widget.set.name,
-                            style: Theme.of(context).textTheme.titleLarge,
+                            style: GoogleFonts.poppins(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF364B9A), // navy
+                            ),
                           ),
                         ),
                         Container(
@@ -231,8 +235,8 @@ class _SetWidgetState extends State<SetWidget> {
                             icon: const Icon(Icons.delete, color: Colors.red),
                             iconSize: 30,
                             onPressed: () {
-                                widget.onDelete.call(widget.set);
-                              }
+                              widget.onDelete.call(widget.set);
+                            },
                           ),
                         ),
                       ],
@@ -334,7 +338,6 @@ class _SetWidgetState extends State<SetWidget> {
                     )
                   else
                     const SizedBox(),
-
                 ],
               ),
             ],
