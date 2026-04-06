@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'HearAble',
+      title: 'EchoLearn',
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFF364B9A), // navy background
         colorScheme: ColorScheme.fromSeed(
@@ -44,6 +44,11 @@ class MyApp extends StatelessWidget {
           ),
           titleMedium: GoogleFonts.poppins(
             fontSize: 40,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFFFDB366), // orange
+          ),
+          titleSmall: GoogleFonts.poppins(
+            fontSize: 24,
             fontWeight: FontWeight.bold,
             color: const Color(0xFFFDB366), // orange
           ),
@@ -100,7 +105,7 @@ class HomeScreen extends StatelessWidget {
               ),
               SizedBox(width: 10, height: 10),
               Text(
-                "Welcome to HearAble",
+                "Welcome to EchoLearn!",
                 style: GoogleFonts.poppins(
                   textStyle: Theme.of(context).textTheme.titleLarge,
                 ),
@@ -144,15 +149,16 @@ class HomeScreen extends StatelessWidget {
                   shadowColor: Colors.black,
                   elevation: 10.0,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 60,
+                    horizontal: 30,
+                    vertical: 30,
                   ),
                 ),
                 child: Text(
                   "Import CSV",
                   style: GoogleFonts.poppins(
-                    textStyle: Theme.of(context).textTheme.titleMedium
-                        ?.copyWith(color: const Color(0xFF364B9A)),
+                    textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: const Color(0xFF364B9A),
+                    ),
                   ),
                 ),
               ),
@@ -189,7 +195,23 @@ class HomeScreen extends StatelessWidget {
                     onAddSet(newSet);
                   }
                 },
-                child: Text("Generate with AI"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFDB366), // orange
+                  foregroundColor: Colors.black, // more readable
+                  shadowColor: Colors.black,
+                  elevation: 10.0,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 30,
+                  ),
+                ),
+                child: Text(
+                  "Generate with AI",
+                  style: GoogleFonts.poppins(
+                    textStyle: Theme.of(context).textTheme.titleMedium
+                        ?.copyWith(color: const Color(0xFF364B9A)),
+                  ),
+                ),
               ),
               //   ElevatedButton(
               // onPressed: () async {
