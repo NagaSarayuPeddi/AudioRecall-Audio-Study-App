@@ -4,14 +4,19 @@ import 'study_set.dart';
 import 'study_session.dart';
 import 'services/tts_service.dart';
 
+String userName = "";
+
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final Function(String) onNameChanged;
+
+  const ProfileScreen({super.key, required this.onNameChanged});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  TextEditingController nameController = TextEditingController();
   void initState() {
     super.initState();
     loadVoices();
@@ -29,9 +34,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Settings"), centerTitle: true),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF364B9A), // navy
+        foregroundColor: Colors.white, // white text
+        title: Text("Settings"),
+        centerTitle: true,
+      ),
       body: Column(
         children: [
+          SizedBox(height: 20),
+
+          Text(
+            "Your Name",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white, // white stands out
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: TextField(
+              controller: nameController,
+              onChanged: (value) {
+                widget.onNameChanged(value);
+              },
+              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold,), // white text
+              decoration: InputDecoration(
+                hintText: "Enter your name",
+                hintStyle: TextStyle(color: const Color(0xFFFDB366), fontSize: 20, fontWeight: FontWeight.bold,),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: const Color(0xFFFDB366)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: const Color(0xFFFDB366)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: const Color(0xFFFDB366),
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          SizedBox(height: 20),
           Text(
             "Voice",
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -43,12 +92,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Colors.white,
               ),
+              dropdownColor: const Color(0xFF364B9A), // navy dropdown
               hint: Text(
                 "Select Voice",
-                //style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(color: const Color(0xFFFDB366)), // orange
               ),
+           //   hint: Text(
+          //      "Select Voice",
+           //     //style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          //    ),
               value: TTSSettings.selectedVoice,
               items: TTSSettings.voices.map((voice) {
                 //final v = Map<String, String>.from(voice);
@@ -82,6 +136,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           Slider(
+            activeColor: const Color(0xFFFDB366), // orange
+            inactiveColor: Colors.white24, // light contrast
             value: TTSSettings.speechRate,
             min: 0.2,
             max: 2.0,

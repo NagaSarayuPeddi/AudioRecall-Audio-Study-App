@@ -532,7 +532,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          const ProfileScreen(), // <-- your settings screen
+                          ProfileScreen(onNameChanged: (name) {}),
                     ),
                   );
                 },

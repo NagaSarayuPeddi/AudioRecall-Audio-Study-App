@@ -23,29 +23,38 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Audio Study App',
+      title: 'HearAble',
       theme: ThemeData(
+        scaffoldBackgroundColor: const Color(0xFF364B9A), // navy background
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 0, 132, 255),
+          seedColor: const Color(0xFF364B9A), // navy
+          primary: const Color(0xFF364B9A), // navy
+          secondary: const Color(0xFFFDB366), // orange
         ),
         textTheme: TextTheme(
           displayLarge: const TextStyle(
             fontSize: 72,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: Colors.white, // white on dark background
           ),
           titleLarge: GoogleFonts.poppins(
             fontSize: 30,
             fontWeight: FontWeight.bold,
-            // color: Color.fromRGBO(255, 194, 10, 10),
+            color: Colors.white,
           ),
           titleMedium: GoogleFonts.poppins(
             fontSize: 40,
             fontWeight: FontWeight.bold,
-            color: Color.fromRGBO(12, 123, 220, 1),
+            color: const Color(0xFFFDB366), // orange
           ),
-          bodyMedium: GoogleFonts.poppins(),
-          displaySmall: GoogleFonts.poppins(color: Colors.black, fontSize: 24),
+          bodyMedium: GoogleFonts.poppins(color: Colors.white),
+          displaySmall: GoogleFonts.poppins(color: Colors.white, fontSize: 24),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFFDB366), // orange buttons
+            foregroundColor: Colors.black, // text on buttons
+          ),
         ),
       ),
       home: const BottomNavBar(),
@@ -63,6 +72,7 @@ class MyApp extends StatelessWidget {
 // }
 
 class HomeScreen extends StatelessWidget {
+  final String userName;
   final VoidCallback onCreateSetButtonPressed;
   final void Function(StudySet newSet) onAddSet;
 
@@ -70,26 +80,27 @@ class HomeScreen extends StatelessWidget {
     super.key,
     required this.onCreateSetButtonPressed,
     required this.onAddSet,
+    required this.userName,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(12, 123, 220, 1),
+      backgroundColor: const Color(0xFF364B9A),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Center(
           child: Column(
             children: [
               Text(
-                "Hello!",
+                userName.isEmpty ? "Hello!" : "Hello, $userName!",
                 style: GoogleFonts.poppins(
                   textStyle: Theme.of(context).textTheme.displayLarge,
                 ),
               ),
               SizedBox(width: 10, height: 10),
               Text(
-                "Welcome to Audio Study App",
+                "Welcome to HearAble",
                 style: GoogleFonts.poppins(
                   textStyle: Theme.of(context).textTheme.titleLarge,
                 ),
@@ -97,11 +108,10 @@ class HomeScreen extends StatelessWidget {
               ),
               SizedBox(width: 40, height: 40),
               Divider(
-                // Horizontal line separator
-                color: const Color.fromRGBO(255, 194, 10, 1),
-                thickness: 3, // Line thickness
-                indent: 16, // Space at the start of the line
-                endIndent: 16, // Space at the end of the line
+                color: const Color(0xFFFDB366), // orange
+                thickness: 3,
+                indent: 16,
+                endIndent: 16,
               ),
               SizedBox(width: 40, height: 40),
               ElevatedButton(
@@ -112,13 +122,8 @@ class HomeScreen extends StatelessWidget {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(
-                    255,
-                    194,
-                    10,
-                    1,
-                  ), // fixed opacity
-                  foregroundColor: Colors.white,
+                  backgroundColor: const Color(0xFFFDB366), // orange
+                  foregroundColor: Colors.black, // more readable
                   shadowColor: Colors.black,
                   elevation: 10.0,
                   padding: const EdgeInsets.symmetric(
@@ -129,7 +134,7 @@ class HomeScreen extends StatelessWidget {
                 child: Text(
                   "Import CSV",
                   style: GoogleFonts.poppins(
-                    textStyle: Theme.of(context).textTheme.titleMedium,
+                    textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(color: const Color(0xFF364B9A)),
                   ),
                 ),
               ),
@@ -200,6 +205,7 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class BottomNavBarState extends State<BottomNavBar> {
+  String userName = "";
   int selectedIndex = 0;
   //final List<StudySet> finalSets = [];
   final List<StudySet> sets = [];
@@ -276,9 +282,16 @@ class BottomNavBarState extends State<BottomNavBar> {
           HomeScreen(
             onCreateSetButtonPressed: () => onIconPressed(1),
             onAddSet: addSet,
+            userName: userName,
           ),
           SetsScreen(sets: sets, onDelete: deleteSet),
-          const ProfileScreen(),
+          ProfileScreen(
+            onNameChanged: (name) {
+              setState(() {
+                userName = name;
+              });
+            },
+          ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -424,7 +437,7 @@ class SetsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(12, 123, 220, 10),
+      backgroundColor: const Color(0xFF364B9A),
       appBar: AppBar(title: const Text('Sets')),
       body: ListView.builder(
         itemCount: sets.length,

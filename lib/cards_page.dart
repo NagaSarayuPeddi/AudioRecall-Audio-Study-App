@@ -60,8 +60,9 @@ class CardPageState extends State<CardPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        const ProfileScreen(), // <-- replace if your class is different
+                    builder: (context) => ProfileScreen(
+                      onNameChanged: (name) {},
+                    ), // <-- replace if your class is different
                   ),
                 );
               },
