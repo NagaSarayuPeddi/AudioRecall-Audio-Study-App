@@ -22,7 +22,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   //bool isRetrying = false;
   int currentQuestionIndex = 0;
   int num = 1;
-  Color bgdColor = Colors.white;
+  Color bgdColor = const Color(0xFF364B9A); //navy
   // bool tap = false;
   // bool doubleTap = false;
   bool showAnswer = false;
@@ -409,7 +409,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     setState(() {
       isSessionActive = false;
       isListening = false;
-      bgdColor = Colors.white;
+      bgdColor = const Color(0xFF364B9A);
     });
   }
 
@@ -427,7 +427,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     });
     await TTSSettings.tts.speak("Number $number : $answer");
     setState(() {
-      bgdColor = Colors.white;
+      bgdColor = const Color(0xFF364B9A); 
     });
   }
 
@@ -454,6 +454,11 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
           title: Text("Session Summary"),
           content: Text(
             "Correct: $correctAnswers\nWrong: $wrongAnswers\nTotal: ${wrongAnswers + correctAnswers}",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           actions: [
             TextButton(
@@ -505,6 +510,8 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
 
         /// appBar: AppBar(title: Text("Study Session"), centerTitle: true),
         appBar: AppBar(
+          backgroundColor: const Color(0xFF364B9A),
+          foregroundColor: Colors.white,
           title: Text("Study Session"),
           centerTitle: true,
           actions: [
@@ -516,8 +523,8 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                     horizontal: 20,
                     vertical: 15,
                   ),
-                  backgroundColor: Colors.white, // makes it pop on AppBar
-                  foregroundColor: Colors.black,
+                  backgroundColor: const Color(0xFFFDB366), // orange
+                  foregroundColor: const Color(0xFF364B9A), // navy text
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -545,12 +552,16 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
           children: [
             Text(
               "Studying: ${widget.setToStudy.name}",
-              style: TextStyle(fontSize: 33, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 33,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
             SizedBox(height: 5),
             Text(
               "Tap the card to show the answer",
-              style: TextStyle(fontSize: 26),
+              style: TextStyle(fontSize: 26, color: Colors.white70),
             ),
             SizedBox(height: 30),
             GestureDetector(
@@ -560,7 +571,11 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                 });
               },
               child: Card(
+                color: const Color(0xFFFDB366),
                 margin: EdgeInsets.all(16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: Padding(
                   padding: EdgeInsets.all(16),
                   child: Column(
@@ -571,7 +586,12 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                                   .setToStudy
                                   .flashCards[currentQuestionIndex]
                                   .answer,
-                              style: TextStyle(fontSize: 30),
+                              style: TextStyle(
+                                fontSize: 30,
+                                color: const Color(
+                                  0xFF364B9A,
+                                ), // navy text on orange
+                              ),
                               textAlign: TextAlign.center,
                             )
                           : Text(
@@ -582,6 +602,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                               style: TextStyle(
                                 fontSize: 65,
                                 fontWeight: FontWeight.w900,
+                                color: const Color(0xFF364B9A),
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -610,7 +631,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                       }
                     });
                   },
-                  icon: Icon(Icons.arrow_back_ios),
+                  icon: Icon(Icons.arrow_back_ios, color: Colors.white),
                 ),
                 IconButton(
                   onPressed: () {
@@ -622,7 +643,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                       }
                     });
                   },
-                  icon: Icon(Icons.arrow_forward_ios),
+                  icon: Icon(Icons.arrow_forward_ios, color: Colors.white),
                 ),
               ],
             ),
@@ -630,13 +651,15 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
             SizedBox(height: 10),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFDB366), // orange
+                foregroundColor: const Color(0xFF364B9A), // navy text
                 padding: const EdgeInsets.symmetric(
                   horizontal: 50,
                   vertical: 20,
                 ),
                 textStyle: const TextStyle(
                   fontSize: 24,
-                  fontWeight: FontWeight.bold, // bold text
+                  fontWeight: FontWeight.bold,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
@@ -655,7 +678,11 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
             SizedBox(height: 30),
 
             Container(
-              color: Colors.white,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              margin: EdgeInsets.symmetric(horizontal: 20),
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -666,7 +693,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                           widget.setToStudy.flashCards.length,
                       minHeight: 10,
                       backgroundColor: Colors.grey[300],
-                      color: Colors.blue,
+                      color: const Color(0xFFFDB366),
                     ),
 
                     SizedBox(height: 8),
@@ -676,6 +703,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
+                        color: const Color(0xFFFDB366),
                       ),
                     ),
                   ],

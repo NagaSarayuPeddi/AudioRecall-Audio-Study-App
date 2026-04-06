@@ -78,7 +78,7 @@ class _SetWidgetState extends State<SetWidget> {
       },
       style: TextButton.styleFrom(padding: EdgeInsets.zero),
       child: Card(
-        color: Color.fromRGBO(255, 194, 10, 10),
+        color: const Color(0xFFFDB366),
         margin: const EdgeInsets.all(10),
         child: Padding(
           padding: const EdgeInsets.all(15.0),
@@ -220,13 +220,6 @@ class _SetWidgetState extends State<SetWidget> {
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                         ),
-                      //  IconButton(
-                     ///     icon: const Icon(Icons.delete, color: Colors.red),
-                      //    iconSize: 30,
-                     ///     onPressed: () {
-                     //       widget.onDelete.call(widget.set);
-                     //     },
-                   //     ),
                         Container(
                           width: 70,
                           height: 70,
@@ -342,7 +335,6 @@ class _SetWidgetState extends State<SetWidget> {
                   else
                     const SizedBox(),
 
-           //       Spacer(), // pushes delete to the right
                 ],
               ),
             ],

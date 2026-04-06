@@ -31,8 +31,11 @@ class CardPageState extends State<CardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF364B9A), // navy background
       // appBar: AppBar(title: Text(widget.cardSet.name), centerTitle: true),
       appBar: AppBar(
+        backgroundColor: const Color(0xFF364B9A), // navy
+        foregroundColor: Colors.white, // white text
         title: Text(widget.cardSet.name),
         centerTitle: true,
         actions: [
@@ -44,8 +47,8 @@ class CardPageState extends State<CardPage> {
                   horizontal: 20,
                   vertical: 15,
                 ),
-                backgroundColor: Colors.white, // makes it pop on AppBar
-                foregroundColor: Colors.black,
+                backgroundColor: const Color(0xFFFDB366), // orange
+                foregroundColor: const Color(0xFF364B9A), // navy
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -91,7 +94,7 @@ class CardPageState extends State<CardPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
-                icon: const Icon(Icons.add),
+                icon: const Icon(Icons.add, color: Color(0xFFFDB366)),
                 iconSize: 30,
                 onPressed: () {
                   setState(() {
@@ -124,7 +127,7 @@ class CardPageState extends State<CardPage> {
                   "Add Card",
                   style: GoogleFonts.poppins(
                     textStyle: Theme.of(context).textTheme.titleMedium,
-                    color: Theme.of(context).colorScheme.secondary,
+                    color: const Color(0xFFFDB366),
                     fontSize: 20,
                   ),
                 ),
@@ -144,7 +147,7 @@ class CardPageState extends State<CardPage> {
             },
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-              backgroundColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: const Color(0xFFFDB366), // orange
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -153,7 +156,7 @@ class CardPageState extends State<CardPage> {
               "Go to Study Session",
               style: GoogleFonts.poppins(
                 fontSize: 20,
-                color: Colors.white,
+                color: const Color(0xFF364B9A),
                 fontWeight: FontWeight.bold,
               ),
             ),
