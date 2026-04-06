@@ -106,7 +106,24 @@ class HomeScreen extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(width: 40, height: 40),
+              //SizedBox(width: 40, height: 40),
+              SizedBox(height: 20), // optional spacing
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF364B9A), // navy background
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.headphones,
+                    size: 80,
+                    color: const Color(0xFFFDB366), // orange
+                  ),
+                ),
+              ),
+              SizedBox(height: 20), // spacing before divider
               Divider(
                 color: const Color(0xFFFDB366), // orange
                 thickness: 3,
@@ -134,7 +151,8 @@ class HomeScreen extends StatelessWidget {
                 child: Text(
                   "Import CSV",
                   style: GoogleFonts.poppins(
-                    textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(color: const Color(0xFF364B9A)),
+                    textStyle: Theme.of(context).textTheme.titleMedium
+                        ?.copyWith(color: const Color(0xFF364B9A)),
                   ),
                 ),
               ),
