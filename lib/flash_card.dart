@@ -72,8 +72,8 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                 if (widget.flashCard.isEditing) {
                   return Row(
                     children: [
-                      Text("Q:", style: Theme.of(context).textTheme.titleLarge),
-                      const SizedBox(width: 10),
+                      // Text("Q:", style: Theme.of(context).textTheme.titleLarge),
+                      // const SizedBox(width: 10),
                       Expanded(
                         child: TextField(
                           controller: questionController,
@@ -84,11 +84,11 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                           ),
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
-                            hintText: 'Enter a question',
+                            hintText: 'Enter a word',
                             hintStyle: const TextStyle(
                               color: Color(0xFF364B9A),
                             ),
-                            labelText: 'Question',
+                            labelText: 'Word',
                             labelStyle: const TextStyle(
                               color: Color(0xFF364B9A),
                             ),
@@ -99,6 +99,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                         //     style: Theme.of(context).textTheme.titleLarge,
                         //   ),
                       ),
+                      SizedBox(width: 10),
                       GestureDetector(
                         onTap: () async {
                           if (!isListeningQuestion) {
@@ -150,8 +151,8 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                     widget.flashCard.question,
                     style: const TextStyle(
                       color: Color(0xFF364B9A), // navy
-                      fontSize: 26,
                       fontWeight: FontWeight.w900,
+                      fontSize: 28,
                     ),
                   );
                 }
@@ -163,11 +164,11 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                 if (widget.flashCard.isEditing) {
                   return Row(
                     children: [
-                      Text(
-                        "A:",
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(width: 10),
+                      // Text(
+                      //   "A:",
+                      //   style: Theme.of(context).textTheme.titleMedium,
+                      // ),
+                      // const SizedBox(width: 10),
                       Expanded(
                         child: widget.flashCard.isEditing
                             ? TextField(
@@ -178,11 +179,14 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                                 ),
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
-                                  hintText: 'Enter the answer',
-                                  hintStyle: TextStyle(color: Color(0xFF364B9A)),
-                                  labelText: 'Answer',
-                                  labelStyle:  TextStyle(color: Color(0xFF364B9A)),
-
+                                  hintText: 'Enter the definition',
+                                  hintStyle: TextStyle(
+                                    color: Color(0xFF364B9A),
+                                  ),
+                                  labelText: 'Definition',
+                                  labelStyle: TextStyle(
+                                    color: Color(0xFF364B9A),
+                                  ),
                                 ),
                               )
                             : Text(
@@ -193,6 +197,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                                 ),
                               ),
                       ),
+                      SizedBox(width: 10),
                       GestureDetector(
                         onTap: () async {
                           if (!isListeningAnswer) {
