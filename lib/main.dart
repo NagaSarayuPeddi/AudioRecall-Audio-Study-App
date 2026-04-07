@@ -114,21 +114,18 @@ class HomeScreen extends StatelessWidget {
               //SizedBox(width: 40, height: 40),
               SizedBox(height: 20), // optional spacing
               Container(
-                width: 80,
-                height: 80,
+                width: 300,
+                height: 120,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF364B9A), // navy background
+                  color: const Color(0xFF364B9A),
                   shape: BoxShape.circle,
                 ),
-                child: Center(
-                  child: Icon(
-                    Icons.headphones,
-                    size: 80,
-                    color: const Color(0xFFFDB366), // orange
-                  ),
+                child: Image.asset(
+                  'assets/images/echolearn.png',
+                  fit: BoxFit.cover, // fills the container completely
                 ),
               ),
-              SizedBox(height: 20), // spacing before divider
+              SizedBox(height: 20), // spacing
               Divider(
                 color: const Color(0xFFFDB366), // orange
                 thickness: 3,
@@ -492,7 +489,7 @@ class SetsScreen extends StatelessWidget {
                   return AlertDialog(
                     content: const Text(
                       'Are you sure you want to delete this set?',
-                      style: TextStyle(fontSize: 20),
+                      style: TextStyle(fontSize: 20, color: Colors.black),
                       textAlign: TextAlign.center,
                     ),
 

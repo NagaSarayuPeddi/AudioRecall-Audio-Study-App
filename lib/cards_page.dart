@@ -173,7 +173,7 @@ class CardPageState extends State<CardPage> {
                         return AlertDialog(
                           content: const Text(
                             'Are you sure you want to delete this flash card?',
-                            style: TextStyle(fontSize: 20),
+                            style: TextStyle(fontSize: 20, color: Colors.black),
                             textAlign: TextAlign.center,
                           ),
 

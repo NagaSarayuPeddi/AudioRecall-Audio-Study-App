@@ -73,6 +73,7 @@ flutter:
       - assets/data/geography.csv
       - assets/data/psychology_terms.csv
       - assets/data/sat_vocab.csv
+      - assets/images/echolearn.png 
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
