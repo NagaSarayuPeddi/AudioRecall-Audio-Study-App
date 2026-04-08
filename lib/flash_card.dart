@@ -259,18 +259,33 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
               },
             ),
             const SizedBox(height: 10),
-            if (widget.flashCard.isEditing)
-              TextButton(onPressed: onDonePressed, child: Text("Done"))
-            else
-              IconButton(
-                icon: Icon(Icons.delete),
-                color: Colors.red,
-                onPressed: () {
-                  if (widget.onDeleteCard != null) {
-                    widget.onDeleteCard!(widget.flashCard);
-                  }
-                },
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (widget.flashCard.isEditing)
+                  TextButton(onPressed: onDonePressed, child: Text("Done"))
+                else
+                  IconButton(
+                    icon: Icon(Icons.delete),
+                    color: Colors.red,
+                    onPressed: () {
+                      if (widget.onDeleteCard != null) {
+                        widget.onDeleteCard!(widget.flashCard);
+                      }
+                    },
+                  ),
+
+                Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    color: Colors.purple,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.volume_up, size: 40, color: Colors.white),
+                ),
+              ],
+            ),
           ],
         ),
       ),

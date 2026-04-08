@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'profile_screen.dart';
+import 'instruction_screen.dart';
 import 'services/ai_service.dart';
 import 'services/tts_service.dart';
 import 'services/stt_service.dart';
@@ -317,13 +318,30 @@ class BottomNavBarState extends State<BottomNavBar> {
       // ),
       body: IndexedStack(
         index: selectedIndex,
+        //   children: [
+        //   HomeScreen(
+        //    onCreateSetButtonPressed: () => onIconPressed(1),
+        //    onAddSet: addSet,
+        //    userName: userName,
+        //   ),
+        //   SetsScreen(sets: sets, onDelete: deleteSet),
+        ///   ProfileScreen(
+        ////     onNameChanged: (name) {
+        //       setState(() {
+        //         userName = name;
+        //       });
+        //   },
+        //   ),
+        // ],
         children: [
           HomeScreen(
             onCreateSetButtonPressed: () => onIconPressed(1),
             onAddSet: addSet,
             userName: userName,
           ),
+
           SetsScreen(sets: sets, onDelete: deleteSet),
+
           ProfileScreen(
             onNameChanged: (name) {
               setState(() {
@@ -331,18 +349,29 @@ class BottomNavBarState extends State<BottomNavBar> {
               });
             },
           ),
+
+          InstructionScreen(
+            onImportCsv: () {
+              print("need to add csv import");
+            },
+            onGenerateAI: () {
+              print("not here");
+            },
+          ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         onTap: onIconPressed,
+        backgroundColor: Colors.white,
+        selectedItemColor: const Color(0xFF364B9A),
+        unselectedItemColor: const Color.fromARGB(179, 118, 115, 115),
+        type: BottomNavigationBarType.fixed, // IMPORTANT for 4 items
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.book), label: "Sets"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: "Settings",
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(Icons.help), label: "Info"),
         ],
       ),
     );
