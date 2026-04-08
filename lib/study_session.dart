@@ -25,7 +25,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   Color bgdColor = const Color(0xFF364B9A); //navy
   // bool tap = false;
   // bool doubleTap = false;
-  bool showAnswer = false;
+  bool showDefinition = false;
 
   int correctAnswers = 0;
   int wrongAnswers = 0;
@@ -51,17 +51,6 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     STTService().initialize();
   }
 
-  // Future<void> loadVoices() async {
-  //   TTSSettings.voices = await TTSSettings.tts.getVoices();
-
-  //   if (TTSSettings.voices.isNotEmpty) {
-  //     TTSSettings.selectedVoice = TTSSettings.voices.first;
-  //     await TTSSettings.tts.setVoice(TTSSettings.selectedVoice!);
-  //   }
-
-  //   setState(() {});
-  // }
-
   Future<void> startSession() async {
     setState(() {
       isSessionActive = true;
@@ -71,135 +60,28 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       correctAnswers = 0;
       attempts = 1;
       bgdColor = Colors.blue;
+      showDefinition = true;
     });
     await TTSSettings.tts.speak(
       'Starting study session for set ${widget.setToStudy.name}.',
     );
 
     await runQuestion(false);
-    // await readAnswer();
-    // await Future.delayed(const Duration(milliseconds: 500));
-    //startListening();
-
-    // while (isSessionActive) {
-    //   if (currentQuestionIndex >= widget.setToStudy.flashCards.length) {
-    //     await tts.speak(
-    //       "Congratulations! You have completed the study session.",
-    //     );
-
-    //     endSession();
-    //     return;
-    //   }
-
-    //   await readAnswer();
-    //   setState(() {
-    //     bgdColor = Colors.blue;
-    //   });
-    //   await Future.delayed(const Duration(seconds: 1));
-
-    //   String userAnswer = await listenOnce();
-    //   setState(() {
-    //     bgdColor = Colors.black;
-    //   });
-    //   String expectedAnswer = widget
-    //       .setToStudy
-    //       .flashCards[currentQuestionIndex]
-    //       .question
-    //       .toLowerCase()
-    //       .trim();
-    //   if (userAnswer.contains("stop")) {
-    //     await tts.speak("Study session ended. Great job!");
-
-    //     endSession();
-    //     return;
-    //   }
-    //   if (userAnswer.contains(expectedAnswer)) {
-    //     setState(() {
-    //       bgdColor = Colors.green;
-    //     });
-    //     await tts.speak("Correct!");
-    //     await Future.delayed(const Duration(milliseconds: 500));
-    //     currentQuestionIndex++;
-    //   } else if (userAnswer == "" || userAnswer.contains("i don't know")) {
-    //     setState(() {
-    //       bgdColor = Colors.black;
-    //     });
-    //     await tts.speak(
-    //       "Tap the screen to hear the correct answer or double tap to keep trying.",
-    //     );
-    //     setState(() {
-    //       bgdColor = Colors.blue;
-    //     });
-    //     await Future.delayed(const Duration(seconds: 5));
-    //     if (tap) {
-    //       await readQuestion();
-    //       tap = false;
-    //       currentQuestionIndex++;
-    //     } else if (doubleTap) {
-    //       doubleTap = false;
-    //     } else {
-    //       await tts.speak("Let's try that one again.");
-    //       await Future.delayed(const Duration(milliseconds: 500));
-    //     }
-
-    //     await Future.delayed(const Duration(milliseconds: 500));
-    //   } else {
-    //     setState(() {
-    //       bgdColor = Colors.red;
-    //     });
-    //     await tts.speak("Try again!");
-    //     await Future.delayed(const Duration(milliseconds: 500));
-    //     //userAnswer = await listenOnce();
-    //   }
-    // }
   }
-
-  // Future<String> listenOnce() async {
-  //   String resultText = "";
-  //   String lastWords = "";
-
-  //   answerCompleter = Completer<String>();
-
-  //   Timer? silenceTimer;
-
-  //   await stt.listen(
-  //     onResult: (spokenText) {
-  //       lastWords = spokenText;
-  //       silenceTimer?.cancel();
-  //       silenceTimer = Timer(const Duration(seconds: 1), () {
-  //         if (!answerCompleter!.isCompleted) {
-  //           answerCompleter!.complete(lastWords);
-  //         }
-  //       });
-  //     },
-  //   );
-
-  //   //await Future.delayed(Duration(seconds: 2));
-  //   try {
-  //     resultText = await answerCompleter!.future.timeout(
-  //       Duration(seconds: 5),
-  //     ); // max wait time
-  //   } catch (e) {
-  //     resultText = lastWords;
-  //   }
-  //   //esultText = await answerCompleter!.future.timeout(Duration(seconds: 10));
-  //   print("Recognized speech: $resultText");
-  //   await stt.stopListening();
-
-  //   //await Future.delayed(Duration(milliseconds: 500));
-
-  //   return resultText.toLowerCase().trim();
-  // }
 
   Future<void> runQuestion(bool isRetrying) async {
     if (!isSessionActive) return;
 
     if (currentQuestionIndex >= widget.setToStudy.flashCards.length) {
       await TTSSettings.tts.speak("Congratulations! You finished!");
-      await speakSummary();
+      //await speakSummary();
       endSession();
       return;
     }
+
+    setState(() {
+      showDefinition = true;
+    });
 
     if (!isRetrying) {
       attempts = 1;
@@ -220,6 +102,10 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   }
 
   Future<void> handleAnswer(String userAnswer) async {
+    if (currentQuestionIndex >= widget.setToStudy.flashCards.length) {
+      return;
+    }
+
     String expectedAnswer = widget
         .setToStudy
         .flashCards[currentQuestionIndex]
@@ -249,12 +135,13 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
 
       setState(() {
         currentQuestionIndex++;
-        showAnswer = false;
+        showDefinition = false;
       });
       num++;
       await Future.delayed(const Duration(milliseconds: 500));
-
-      await runQuestion(false);
+      if (currentQuestionIndex <= widget.setToStudy.flashCards.length) {
+        await runQuestion(false);
+      }
     }
     // no answer is given or they don't know
     else if (userAnswer == "" || userAnswer.contains("don't know")) {
@@ -283,12 +170,14 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
 
           setState(() {
             currentQuestionIndex++;
-            showAnswer = false;
+            showDefinition = false;
           });
           num++;
           await Future.delayed(const Duration(milliseconds: 500));
 
-          await runQuestion(false);
+          if (currentQuestionIndex <= widget.setToStudy.flashCards.length) {
+            await runQuestion(false);
+          }
         } else {
           await TTSSettings.tts.speak("Okay, let's try that one again.");
           await Future.delayed(const Duration(milliseconds: 500));
@@ -308,11 +197,15 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
         await readQuestion();
         setState(() {
           currentQuestionIndex++;
-          showAnswer = false;
+          showDefinition = false;
+          wrongAnswers++;
+          print("wrong answers: $wrongAnswers");
         });
         num++;
         //await Future.delayed(const Duration(milliseconds: 500));
-        await runQuestion(false);
+        if (currentQuestionIndex <= widget.setToStudy.flashCards.length) {
+          await runQuestion(false);
+        }
       } else if (action == "double") {
         //await Future.delayed(const Duration(milliseconds: 500));
         await runQuestion(
@@ -336,66 +229,6 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     }
   }
 
-  // void startListening() async {
-  //   if (!await stt.initialize()) {
-  //     print("Speech recognition not available");
-  //     return;
-  //   }
-
-  //   setState(() => isListening = true);
-
-  //   await stt.listen(
-  //     onResult: (spokenText) async {
-  //       String spoken = spokenText.toLowerCase().trim();
-  //       String expected = widget
-  //           .setToStudy
-  //           .flashCards[currentQuestionIndex]
-  //           .question
-  //           .toLowerCase()
-  //           .trim();
-
-  //       print("Spoken: $spoken");
-  //       print("Expected: $expected");
-
-  //       // Stop listening once we got a result
-  //       await stt.stopListening();
-  //       setState(() => isListening = false);
-
-  //       // Check for stop command
-  //       if (spoken.contains("stop")) {
-  //         await tts.speak("Study session ended. Great job!");
-  //         endSession();
-  //         return;
-  //       }
-
-  //       // Check if user said the correct word
-  //       if (spoken.contains(expected)) {
-  //         await tts.speak("Correct!");
-  //         await Future.delayed(Duration(milliseconds: 500));
-
-  //         if (currentQuestionIndex < widget.setToStudy.flashCards.length - 1) {
-  //           setState(() => currentQuestionIndex++);
-  //           await Future.delayed(Duration(milliseconds: 300));
-
-  //           await readAnswer(); // speak next definition
-  //           await Future.delayed(Duration(milliseconds: 700));
-
-  //           startListening(); // listen for next word
-  //         } else {
-  //           await tts.speak(
-  //             "Congratulations! You have completed the study session.",
-  //           );
-  //           endSession();
-  //         }
-  //       } else {
-  //         await tts.speak("Try again!");
-  //         await Future.delayed(Duration(milliseconds: 500));
-  //         startListening(); // try again
-  //       }
-  //     },
-  //   );
-  // }
-
   Future<void> endSession() async {
     TTSSettings.tts.stop();
     await STTService().stopListening();
@@ -404,7 +237,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     }
 
     showSummaryDialog();
-    speakSummary();
+    await speakSummary();
 
     setState(() {
       isSessionActive = false;
@@ -414,6 +247,11 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   }
 
   Future<void> readQuestion() async {
+    if (currentQuestionIndex >= widget.setToStudy.flashCards.length) return;
+
+    setState(() {
+      showDefinition = false;
+    });
     String question =
         widget.setToStudy.flashCards[currentQuestionIndex].question;
     await TTSSettings.tts.speak("The correct answer is: $question");
@@ -421,25 +259,27 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   }
 
   Future<void> readAnswer(int number) async {
+    if (currentQuestionIndex >= widget.setToStudy.flashCards.length) return;
+
     String answer = widget.setToStudy.flashCards[currentQuestionIndex].answer;
     setState(() {
       bgdColor = Colors.black;
     });
     await TTSSettings.tts.speak("Number $number : $answer");
     setState(() {
-      bgdColor = const Color(0xFF364B9A); 
+      bgdColor = const Color(0xFF364B9A);
     });
   }
 
   Future<void> speakSummary() async {
     await TTSSettings.tts.speak("Do you want to hear your session summary?");
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     String response = await STTService().listenOnce();
 
     if (response.contains("yes") || response.contains("sure")) {
       await TTSSettings.tts.speak(
-        "You got $correctAnswers correct and $wrongAnswers wrong out of ${widget.setToStudy.flashCards.length} flashcards.",
+        "You got $correctAnswers correct and $wrongAnswers wrong out of ${correctAnswers + wrongAnswers} flashcards.",
       );
     } else {
       await TTSSettings.tts.speak("Okay. Bye!");
@@ -486,6 +326,12 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   //   );
   // }
   Widget build(BuildContext context) {
+    int safeIndex = currentQuestionIndex;
+
+    if (safeIndex >= widget.setToStudy.flashCards.length) {
+      safeIndex = widget.setToStudy.flashCards.length - 1;
+    }
+
     return GestureDetector(
       onTap: () {
         if (tapCompleter != null && !tapCompleter!.isCompleted) {
@@ -567,7 +413,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
             GestureDetector(
               onTap: () {
                 setState(() {
-                  showAnswer = !showAnswer;
+                  showDefinition = !showDefinition;
                 });
               },
               child: Card(
@@ -580,12 +426,9 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                   padding: EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      showAnswer
+                      showDefinition
                           ? Text(
-                              widget
-                                  .setToStudy
-                                  .flashCards[currentQuestionIndex]
-                                  .answer,
+                              widget.setToStudy.flashCards[safeIndex].answer,
                               style: TextStyle(
                                 fontSize: 30,
                                 color: const Color(
@@ -595,10 +438,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                               textAlign: TextAlign.center,
                             )
                           : Text(
-                              widget
-                                  .setToStudy
-                                  .flashCards[currentQuestionIndex]
-                                  .question,
+                              widget.setToStudy.flashCards[safeIndex].question,
                               style: TextStyle(
                                 fontSize: 65,
                                 fontWeight: FontWeight.w900,
@@ -613,7 +453,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
             ),
 
             Text(
-              "${currentQuestionIndex + 1} of ${widget.setToStudy.flashCards.length}",
+              "${safeIndex + 1} of ${widget.setToStudy.flashCards.length}",
               style: TextStyle(fontSize: 25),
             ),
 
@@ -627,7 +467,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                     setState(() {
                       if (currentQuestionIndex > 0) {
                         currentQuestionIndex--;
-                        showAnswer = false;
+                        showDefinition = false;
                       }
                     });
                   },
@@ -639,7 +479,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                       if (currentQuestionIndex <
                           widget.setToStudy.flashCards.length - 1) {
                         currentQuestionIndex++;
-                        showAnswer = false;
+                        showDefinition = false;
                       }
                     });
                   },
@@ -689,8 +529,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                   children: [
                     LinearProgressIndicator(
                       value:
-                          (currentQuestionIndex + 1) /
-                          widget.setToStudy.flashCards.length,
+                          (safeIndex + 1) / widget.setToStudy.flashCards.length,
                       minHeight: 10,
                       backgroundColor: Colors.grey[300],
                       color: const Color(0xFFFDB366),
@@ -699,7 +538,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
                     SizedBox(height: 8),
 
                     Text(
-                      "${(((currentQuestionIndex + 1) / widget.setToStudy.flashCards.length) * 100).round()}% completed",
+                      "${(((safeIndex + 1) / widget.setToStudy.flashCards.length) * 100).round()}% completed",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,

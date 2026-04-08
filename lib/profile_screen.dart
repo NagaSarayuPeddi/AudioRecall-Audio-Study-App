@@ -60,10 +60,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onChanged: (value) {
                 widget.onNameChanged(value);
               },
-              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold,), // white text
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ), // white text
               decoration: InputDecoration(
                 hintText: "Enter your name",
-                hintStyle: TextStyle(color: const Color(0xFFFDB366), fontSize: 20, fontWeight: FontWeight.bold,),
+                hintStyle: TextStyle(
+                  color: const Color(0xFFFDB366),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: const Color(0xFFFDB366)),
                 ),
@@ -99,10 +107,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 "Select Voice",
                 style: TextStyle(color: const Color(0xFFFDB366)), // orange
               ),
-           //   hint: Text(
-          //      "Select Voice",
-           //     //style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          //    ),
+              //   hint: Text(
+              //      "Select Voice",
+              //     //style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              //    ),
               value: TTSSettings.selectedVoice,
               items: TTSSettings.voices.map((voice) {
                 //final v = Map<String, String>.from(voice);
@@ -144,13 +152,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             divisions: 8,
             label: TTSSettings.speechRate.toStringAsFixed(2),
             onChanged: (value) {
-              TTSSettings.tts.speak(
-                "Speech rate set to ${value.toStringAsFixed(2)}",
-              );
+              TTSSettings.tts.stop();
               setState(() {
                 TTSSettings.speechRate = value;
               });
               TTSSettings.tts.setSpeechRate(TTSSettings.speechRate);
+
+              TTSSettings.tts.speak(
+                "Speech rate set to ${value.toStringAsFixed(2)}",
+              );
             },
           ),
         ],

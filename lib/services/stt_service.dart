@@ -1,4 +1,5 @@
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:flutter/material.dart';
 import 'dart:async';
 
 class STTService {
@@ -43,7 +44,7 @@ class STTService {
     //await Future.delayed(Duration(seconds: 2));
     try {
       resultText = await answerCompleter!.future.timeout(
-        Duration(seconds: 5),
+        Duration(seconds: 6),
       ); // max wait time
     } catch (e) {
       resultText = lastWords;

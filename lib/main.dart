@@ -166,7 +166,7 @@ class HomeScreen extends StatelessWidget {
                   await TTSSettings.tts.speak(
                     "What's the topic you want to study?",
                   );
-                  await Future.delayed(const Duration(milliseconds: 500));
+                  await Future.delayed(const Duration(seconds: 2));
 
                   String topic = await STTService().listenOnce();
 
@@ -183,6 +183,8 @@ class HomeScreen extends StatelessWidget {
                   String num = await STTService().listenOnce();
 
                   await Future.delayed(const Duration(seconds: 2));
+
+                  await TTSSettings.tts.speak("Loading your set. Please wait.");
 
                   StudySet? newSet = await AIService.generateStudySet(
                     topic,

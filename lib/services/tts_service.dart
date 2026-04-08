@@ -57,4 +57,8 @@ class TTSSettings {
     print("Loaded voices: ${voices.length}");
     print(voices);
   }
+
+  Future<void> setSpeechRate(double rate) async {
+    await tts.setSpeechRate(rate);
+  }
 }

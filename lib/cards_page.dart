@@ -4,6 +4,7 @@ import 'flash_card.dart';
 import 'profile_screen.dart';
 import 'study_set.dart';
 import 'study_session.dart';
+import 'main.dart';
 
 // class CardPage {
 //   final String id;
@@ -60,6 +61,7 @@ class CardPageState extends State<CardPage> {
               ),
               onPressed: () {
                 // Direct navigation to your settings/profile page
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
