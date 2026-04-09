@@ -27,7 +27,7 @@ class InstructionScreen extends StatelessWidget {
             Text(
               "Through EchoLearn, you can learn through audio instruction, generate study sets with AI, or import your own CSV files.",
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(fontSize: 40, fontWeight: FontWeight.w900, color: const Color(0xFFFDB366)),
+              style: GoogleFonts.poppins(fontSize: 35, fontWeight: FontWeight.w800, color: const Color(0xFFFDB366)),
             ),
 
             const SizedBox(height: 40),

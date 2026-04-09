@@ -43,55 +43,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: Column(
         children: [
           SizedBox(height: 20),
-
-          Text(
-            "Your Name",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white, // white stands out
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: TextField(
-              controller: nameController,
-              onChanged: (value) {
-                widget.onNameChanged(value);
-              },
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ), // white text
-              decoration: InputDecoration(
-                hintText: "Enter your name",
-                hintStyle: TextStyle(
-                  color: const Color(0xFFFDB366),
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: const Color(0xFFFDB366)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: const Color(0xFFFDB366)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: const Color(0xFFFDB366),
-                    width: 2,
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          SizedBox(height: 20),
           Text(
             "Voice",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
           SizedBox(
             width: 250,
@@ -120,7 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     voice['name'] ?? 'Unknown',
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 22,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
@@ -141,7 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           Text(
             "Speed",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
           Slider(
             activeColor: const Color(0xFFFDB366), // orange

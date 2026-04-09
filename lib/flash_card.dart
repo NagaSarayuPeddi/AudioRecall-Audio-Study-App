@@ -79,7 +79,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                           controller: questionController,
                           style: const TextStyle(
                             color: Color(0xFF364B9A), // navy text
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             fontSize: 18,
                           ),
                           decoration: InputDecoration(
@@ -151,8 +151,8 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                     widget.flashCard.question,
                     style: const TextStyle(
                       color: Color(0xFF364B9A), // navy
-                      fontWeight: FontWeight.w900,
-                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 32,
                     ),
                   );
                 }
@@ -192,8 +192,10 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                             : Text(
                                 widget.flashCard.answer,
                                 style: GoogleFonts.poppins(
-                                  fontSize: 20,
-                                  color: const Color(0xFF364B9A),
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  //color: const Color(0xFF364B9A),
                                 ),
                               ),
                       ),
@@ -251,7 +253,8 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                     widget.flashCard.answer,
                     //style: Theme.of(context).textTheme.displaySmall,
                     style: GoogleFonts.poppins(
-                      fontSize: 20,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w600,
                       color: const Color(0xFF364B9A),
                     ),
                   );
@@ -265,15 +268,23 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                 if (widget.flashCard.isEditing)
                   TextButton(onPressed: onDonePressed, child: Text("Done"))
                 else
-                  IconButton(
-                    icon: Icon(Icons.delete),
-                    color: Colors.red,
+                Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    iconSize: 30,
                     onPressed: () {
                       if (widget.onDeleteCard != null) {
                         widget.onDeleteCard!(widget.flashCard);
                       }
                     },
                   ),
+                ),
 
                 Container(
                   width: 70,

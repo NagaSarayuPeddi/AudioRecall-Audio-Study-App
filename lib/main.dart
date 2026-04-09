@@ -98,12 +98,6 @@ class HomeScreen extends StatelessWidget {
         child: Center(
           child: Column(
             children: [
-              Text(
-                userName.isEmpty ? "Hello!" : "Hello, $userName!",
-                style: GoogleFonts.poppins(
-                  textStyle: Theme.of(context).textTheme.displayLarge,
-                ),
-              ),
               SizedBox(width: 10, height: 10),
               Text(
                 "Welcome to EchoLearn!",
@@ -127,6 +121,31 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20), // spacing
+              ElevatedButton(
+                //im new button
+                onPressed: () {
+                  final navBarState = context
+                      .findAncestorStateOfType<BottomNavBarState>();
+                  navBarState?.onIconPressed(3); // 3 = InstructionScreen
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFDB366),
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 17,
+                  ),
+                ),
+                child: Text(
+                  "I'm new",
+                  style: GoogleFonts.poppins(
+                    textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: const Color(0xFF364B9A),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
               Divider(
                 color: const Color(0xFFFDB366), // orange
                 thickness: 3,
@@ -370,7 +389,10 @@ class BottomNavBarState extends State<BottomNavBar> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.book), label: "Sets"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: "Settings",
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.help), label: "Info"),
         ],
       ),
