@@ -135,7 +135,7 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
 
       setState(() {
         currentQuestionIndex++;
-        showDefinition = false;
+        // showDefinition = false;
       });
       num++;
       await Future.delayed(const Duration(milliseconds: 500));
@@ -165,12 +165,14 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
 
         if (yesOrNo.contains("yes") || yesOrNo.contains("sure")) {
           await readQuestion();
-          wrongAnswers++;
+          if (attempts == 1) {
+            wrongAnswers++;
+          }
           print("wrong answers: $wrongAnswers");
 
           setState(() {
             currentQuestionIndex++;
-            showDefinition = false;
+            // showDefinition = false;
           });
           num++;
           await Future.delayed(const Duration(milliseconds: 500));
@@ -198,7 +200,9 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
         setState(() {
           currentQuestionIndex++;
           showDefinition = false;
-          wrongAnswers++;
+          if (attempts == 1) {
+            wrongAnswers++;
+          }
           print("wrong answers: $wrongAnswers");
         });
         num++;
@@ -219,7 +223,9 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
     else {
       setState(() {
         bgdColor = Colors.red;
-        wrongAnswers++;
+        if (attempts == 1) {
+          wrongAnswers++;
+        }
         print("wrong answers: $wrongAnswers");
       });
 
@@ -249,9 +255,9 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   Future<void> readQuestion() async {
     if (currentQuestionIndex >= widget.setToStudy.flashCards.length) return;
 
-    setState(() {
-      showDefinition = false;
-    });
+    // setState(() {
+    //   showDefinition = false;
+    // });
     String question =
         widget.setToStudy.flashCards[currentQuestionIndex].question;
     await TTSSettings.tts.speak("The correct answer is: $question");

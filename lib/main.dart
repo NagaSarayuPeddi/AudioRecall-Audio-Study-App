@@ -20,7 +20,7 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  // root of application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -186,7 +186,7 @@ class HomeScreen extends StatelessWidget {
                   await TTSSettings.tts.speak(
                     "What's the topic you want to study?",
                   );
-                  await Future.delayed(const Duration(seconds: 2));
+                  await Future.delayed(const Duration(milliseconds: 500));
 
                   String topic = await STTService().listenOnce();
 
@@ -202,7 +202,7 @@ class HomeScreen extends StatelessWidget {
 
                   String num = await STTService().listenOnce();
 
-                  await Future.delayed(const Duration(seconds: 2));
+                  await Future.delayed(const Duration(milliseconds: 500));
 
                   await TTSSettings.tts.speak("Loading your set. Please wait.");
 

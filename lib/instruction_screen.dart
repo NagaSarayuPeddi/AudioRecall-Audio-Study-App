@@ -13,11 +13,10 @@ class InstructionScreen extends StatelessWidget {
   //const Color(0xFF364B9A), // navy
   //          secondary: const Color(0xFFFDB366), // orange
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:const Color(0xFF364B9A),
+      backgroundColor: const Color(0xFF364B9A),
       appBar: AppBar(title: const Text("Instructions"), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -27,7 +26,11 @@ class InstructionScreen extends StatelessWidget {
             Text(
               "Through EchoLearn, you can learn through audio instruction, generate study sets with AI, or import your own CSV files.",
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(fontSize: 35, fontWeight: FontWeight.w800, color: const Color(0xFFFDB366)),
+              style: GoogleFonts.poppins(
+                fontSize: 35,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFFFDB366),
+              ),
             ),
 
             const SizedBox(height: 40),
@@ -35,7 +38,9 @@ class InstructionScreen extends StatelessWidget {
             SizedBox(
               width: 200,
               child: ElevatedButton(
-                onPressed: null,
+                onPressed: () {
+                  print("import CSV");
+                },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   backgroundColor: const Color(0xFFFDB366),
@@ -50,7 +55,9 @@ class InstructionScreen extends StatelessWidget {
             SizedBox(
               width: 200,
               child: ElevatedButton(
-                onPressed: null,
+                onPressed: () {
+                  print("generate with AI");
+                },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   backgroundColor: const Color(0xFFFDB366),

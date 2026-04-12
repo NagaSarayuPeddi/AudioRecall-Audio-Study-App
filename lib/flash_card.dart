@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:study_app/services/tts_service.dart';
 import 'services/stt_service.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
@@ -268,23 +269,23 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                 if (widget.flashCard.isEditing)
                   TextButton(onPressed: onDonePressed, child: Text("Done"))
                 else
-                Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      iconSize: 30,
+                      onPressed: () {
+                        if (widget.onDeleteCard != null) {
+                          widget.onDeleteCard!(widget.flashCard);
+                        }
+                      },
+                    ),
                   ),
-                  child: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    iconSize: 30,
-                    onPressed: () {
-                      if (widget.onDeleteCard != null) {
-                        widget.onDeleteCard!(widget.flashCard);
-                      }
-                    },
-                  ),
-                ),
 
                 Container(
                   width: 70,
@@ -293,7 +294,15 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                     color: Colors.purple,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.volume_up, size: 40, color: Colors.white),
+                  child: IconButton(
+                    icon: Icon(Icons.volume_up, color: Colors.white),
+                    iconSize: 40,
+                    onPressed: () async {
+                      await TTSSettings.tts.speak(
+                        "${widget.flashCard.question}: ${widget.flashCard.answer}",
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
