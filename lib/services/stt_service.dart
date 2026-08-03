@@ -1,83 +1,138 @@
 import 'package:speech_to_text/speech_to_text.dart';
-import 'package:flutter/material.dart';
 import 'dart:async';
 
+/// Wraps the speech_to_text plugin with:
+///   - Permission checks before every listen call
+///   - Graceful error callbacks instead of silent failures
+///   - A reliable listenOnce() with silence detection
 class STTService {
   final SpeechToText _speech = SpeechToText();
-  Completer<String>? answerCompleter;
+  Completer<String>? _answerCompleter;
 
+  // ─── Initialisation ───────────────────────────────────────────────────────
+
+  /// Returns true if mic permission was granted and STT is available.
+  /// Safe to call multiple times — speech_to_text guards against double-init.
   Future<bool> initialize() async {
-    return await _speech.initialize(
-      onStatus: (status) => print("STT Status: $status"),
-      onError: (error) => print("STT Error: $error"),
-    );
-  }
+    if (_speech.isAvailable) return true;
 
-  Future<void> listen({required Function(String) onResult}) async {
-    await _speech.listen(
-      onResult: (result) {
-        onResult(result.recognizedWords);
+    final available = await _speech.initialize(
+      onStatus: (status) {
+        // 'done' fires when the recogniser stops after silence
+        // 'notListening' fires when stop() is called explicitly
+        print('STT status: $status');
+      },
+      onError: (error) {
+        print('STT error: ${error.errorMsg} (permanent: ${error.permanent})');
+        // Complete any pending listenOnce with empty string on fatal error
+        if (error.permanent &&
+            _answerCompleter != null &&
+            !_answerCompleter!.isCompleted) {
+          _answerCompleter!.complete('');
+        }
       },
     );
+
+    if (!available) {
+      print(
+        'STT not available — microphone permission denied or '
+        'no speech recognition engine installed.',
+      );
+    }
+
+    return available;
   }
 
-  Future<String> listenOnce() async {
-    String resultText = "";
-    String lastWords = "";
+  // ─── Continuous listening (for text fields) ───────────────────────────────
 
-    answerCompleter = Completer<String>();
+  /// Starts continuous listening and calls [onResult] with each partial result.
+  /// Caller is responsible for calling [stopListening] when done.
+  Future<void> listen({required Function(String) onResult}) async {
+    final available = await initialize();
+    if (!available) return;
 
+    await _speech.listen(
+      onResult: (result) => onResult(result.recognizedWords),
+      listenOptions: SpeechListenOptions(
+        partialResults: true,
+        cancelOnError: false,
+      ),
+    );
+  }
+
+  // ─── Single answer capture (for study sessions) ───────────────────────────
+
+  /// Listens until silence is detected, then returns the recognised text.
+  ///
+  /// - Waits up to [maxWaitSeconds] for the student to start speaking
+  /// - Completes after [silenceSeconds] of silence once speech has begun
+  /// - Returns empty string on timeout or error (caller should treat as
+  ///   "no answer given")
+  Future<String> listenOnce({
+    int maxWaitSeconds = 8,
+    int silenceSeconds = 2,
+  }) async {
+    final available = await initialize();
+    if (!available) return '';
+
+    String lastWords = '';
+    _answerCompleter = Completer<String>();
     Timer? silenceTimer;
+    bool speechDetected = false;
 
     await _speech.listen(
       onResult: (result) {
         lastWords = result.recognizedWords;
+        if (lastWords.isNotEmpty) speechDetected = true;
+
+        // Reset silence timer each time new words arrive
         silenceTimer?.cancel();
-        silenceTimer = Timer(const Duration(seconds: 1), () {
-          if (!answerCompleter!.isCompleted) {
-            answerCompleter!.complete(lastWords);
+        silenceTimer = Timer(Duration(seconds: silenceSeconds), () {
+          if (!_answerCompleter!.isCompleted) {
+            _answerCompleter!.complete(lastWords);
           }
         });
       },
+      listenOptions: SpeechListenOptions(
+        partialResults: true,
+        cancelOnError: false,
+      ),
     );
 
-    //await Future.delayed(Duration(seconds: 2));
+    // Hard timeout — prevents the session hanging if the student says nothing
     try {
-      resultText = await answerCompleter!.future.timeout(
-        Duration(seconds: 6),
-      ); // max wait time
+      lastWords = await _answerCompleter!.future.timeout(
+        Duration(seconds: maxWaitSeconds),
+        onTimeout: () {
+          print(
+            'STT listenOnce timed out after ${maxWaitSeconds}s '
+            '(speech detected: $speechDetected)',
+          );
+          return lastWords; // return whatever we have so far
+        },
+      );
     } catch (e) {
-      resultText = lastWords;
+      print('STT listenOnce error: $e');
+      lastWords = '';
     }
-    //esultText = await answerCompleter!.future.timeout(Duration(seconds: 10));
-    print("Recognized speech: $resultText");
+
+    silenceTimer?.cancel();
     await _speech.stop();
 
-    //await Future.delayed(Duration(milliseconds: 500));
-
-    return resultText.toLowerCase().trim();
+    final result = lastWords.toLowerCase().trim();
+    print('STT recognised: "$result"');
+    return result;
   }
-  // Future<void> listen({required Function(String) onResult}) async {
-  //   await _speech.listen(
-  //     // ignore: deprecated_member_use
-  //     listenMode: ListenMode.confirmation,
-  //     onResult: (result) {
-  //       if (result.finalResult) {
-  //         onResult(result.recognizedWords);
-  //       }
-  //     },
-  //   );
-  // }
 
-  // Future<void> startListening(Function(String) onResult) {
-  //   _speech.listen(
-  //     onResult: (result) {
-  //       onResult(result.recognizedWords);
-  //     },
-  //   );
-  // }
+  // ─── Stop ────────────────────────────────────────────────────────────────
 
   Future<void> stopListening() async {
     await _speech.stop();
   }
+
+  /// Whether the recogniser is currently active
+  bool get isListening => _speech.isListening;
+
+  /// Whether STT was successfully initialised
+  bool get isAvailable => _speech.isAvailable;
 }

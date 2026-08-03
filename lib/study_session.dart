@@ -1,12 +1,11 @@
-//import 'cards_page.dart';
 import 'study_set.dart';
-//import 'flash_card.dart';
-import 'main.dart';
 import 'profile_screen.dart';
 import 'services/stt_service.dart';
 import 'services/tts_service.dart';
+import 'services/semantics_announcer.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'services/answer_matcher.dart';
 
 class StudySessionScreen extends StatefulWidget {
   final StudySet setToStudy;
@@ -19,37 +18,35 @@ class StudySessionScreen extends StatefulWidget {
 
 class _StudySessionScreenState extends State<StudySessionScreen> {
   bool isSessionActive = false;
-  //bool isRetrying = false;
   int currentQuestionIndex = 0;
   int num = 1;
-  Color bgdColor = const Color(0xFF364B9A); //navy
-  // bool tap = false;
-  // bool doubleTap = false;
+  Color bgdColor = const Color(0xFF364B9A);
   bool showDefinition = false;
 
   int correctAnswers = 0;
   int wrongAnswers = 0;
   int attempts = 0;
 
-  // double speechRate = 1.0;
-  // List<dynamic> voices = [];
-  // Map<String, String>? selectedVoice;
-
-  //final stt = STTService();
-  //final tts = TTSService();
-
   Completer<String>? tapCompleter;
-  // Completer<String>? answerCompleter;
-
   bool isListening = false;
 
   @override
   void initState() {
     super.initState();
-    //loadVoices();
     TTSSettings.tts.setSpeechRate(TTSSettings.speechRate);
     STTService().initialize();
   }
+
+  @override
+  void dispose() {
+    // Cancel any pending tap completer so async chains don't run after dispose
+    if (tapCompleter != null && !tapCompleter!.isCompleted) {
+      tapCompleter!.complete('cancel');
+    }
+    super.dispose();
+  }
+
+  // ─── Session control ──────────────────────────────────────────────────────
 
   Future<void> startSession() async {
     setState(() {
@@ -62,26 +59,30 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       bgdColor = Colors.blue;
       showDefinition = true;
     });
-    await TTSSettings.tts.speak(
-      'Starting study session for set ${widget.setToStudy.name}.',
+
+    // Announce to screen reader as well as TTS
+    SemanticsAnnouncer.announce(
+      'Study session started for ${widget.setToStudy.name}.',
+      assertive: true,
     );
 
+    await TTSSettings.tts.speak(
+      'Starting study session for ${widget.setToStudy.name}.',
+    );
     await runQuestion(false);
   }
 
   Future<void> runQuestion(bool isRetrying) async {
-    if (!isSessionActive) return;
+    if (!isSessionActive || !mounted) return;
 
     if (currentQuestionIndex >= widget.setToStudy.flashCards.length) {
-      await TTSSettings.tts.speak("Congratulations! You finished!");
-      //await speakSummary();
+      await TTSSettings.tts.speak('Congratulations! You finished!');
+      SemanticsAnnouncer.announce('Session complete!', assertive: true);
       endSession();
       return;
     }
 
-    setState(() {
-      showDefinition = true;
-    });
+    setState(() => showDefinition = true);
 
     if (!isRetrying) {
       attempts = 1;
@@ -90,93 +91,46 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       attempts++;
     }
 
-    setState(() {
-      bgdColor = Colors.blue;
-    });
+    setState(() => bgdColor = Colors.blue);
 
-    String userAnswer = await STTService().listenOnce();
-
-    if (!isSessionActive) return;
+    final userAnswer = await STTService().listenOnce();
+    if (!isSessionActive || !mounted) return;
 
     await handleAnswer(userAnswer);
   }
 
   Future<void> handleAnswer(String userAnswer) async {
-    if (currentQuestionIndex >= widget.setToStudy.flashCards.length) {
-      return;
-    }
+    if (currentQuestionIndex >= widget.setToStudy.flashCards.length) return;
 
-    String expectedAnswer = widget
-        .setToStudy
-        .flashCards[currentQuestionIndex]
-        .question
-        .toLowerCase()
-        .trim();
+    final expectedAnswer =
+        widget.setToStudy.flashCards[currentQuestionIndex].question;
 
-    //String secondResponse = "";
-
-    // stop
-    if (userAnswer.contains("stop")) {
-      await TTSSettings.tts.speak("Study session ended. Great job!");
+    // ── Stop command ─────────────────────────────────────────────────────────
+    if (userAnswer.contains('stop')) {
+      await TTSSettings.tts.speak('Study session ended. Great job!');
       endSession();
       return;
     }
 
-    // answer is correct
-    if (userAnswer.trim() == expectedAnswer) {
-      setState(() {
-        bgdColor = Colors.green;
-        if (attempts == 1) {
-          correctAnswers++;
-          print("correct answers: $correctAnswers");
-        }
-      });
-      await TTSSettings.tts.speak("Correct!");
+    // ── No answer / don't know ───────────────────────────────────────────────
+    if (userAnswer.isEmpty || userAnswer.contains("don't know")) {
+      setState(() => bgdColor = Colors.black);
 
-      setState(() {
-        currentQuestionIndex++;
-        // showDefinition = false;
-      });
-      num++;
-      await Future.delayed(const Duration(milliseconds: 500));
-      if (currentQuestionIndex <= widget.setToStudy.flashCards.length) {
-        await runQuestion(false);
-      }
-    }
-    // no answer is given or they don't know
-    else if (userAnswer == "" || userAnswer.contains("don't know")) {
-      setState(() {
-        bgdColor = Colors.black;
-      });
       if (userAnswer.contains("don't know")) {
         await TTSSettings.tts.speak(
-          "No worries, do you want to hear the correct answer?",
+          'No worries, do you want to hear the correct answer?',
         );
-
-        //await Future.delayed(const Duration(seconds: 5));
         await Future.delayed(const Duration(milliseconds: 500));
+        setState(() => bgdColor = Colors.blue);
 
-        setState(() {
-          bgdColor = Colors.blue;
-        });
+        final yesOrNo = await STTService().listenOnce();
 
-        String yesOrNo = await STTService().listenOnce();
-        print("Yes or No response: $yesOrNo");
-
-        if (yesOrNo.contains("yes") || yesOrNo.contains("sure")) {
+        if (yesOrNo.contains('yes') || yesOrNo.contains('sure')) {
           await readQuestion();
-          if (attempts == 1) {
-            wrongAnswers++;
-          }
-          print("wrong answers: $wrongAnswers");
-
-          setState(() {
-            currentQuestionIndex++;
-            // showDefinition = false;
-          });
+          if (attempts == 1) wrongAnswers++;
+          setState(() => currentQuestionIndex++);
           num++;
           await Future.delayed(const Duration(milliseconds: 500));
-
           if (currentQuestionIndex <= widget.setToStudy.flashCards.length) {
             await runQuestion(false);
           }
@@ -185,65 +139,105 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
           await Future.delayed(const Duration(milliseconds: 500));
           await runQuestion(true);
         }
-      } else {
-        await TTSSettings.tts.speak(
-          "Do you need help? Tap the screen to hear the correct answer, or double tap to keep trying.",
-        );
+        return;
       }
 
+      await TTSSettings.tts.speak(
+        'Do you need help? Tap the screen to hear the correct answer, '
+        'or double tap to keep trying.',
+      );
+
       tapCompleter = Completer<String>();
+      final action = await tapCompleter!.future;
 
-      String action = await tapCompleter!.future;
-
-      if (action == "tap") {
+      if (action == 'tap') {
         await readQuestion();
         setState(() {
           currentQuestionIndex++;
           showDefinition = false;
-          if (attempts == 1) {
-            wrongAnswers++;
-          }
-          print("wrong answers: $wrongAnswers");
+          if (attempts == 1) wrongAnswers++;
         });
         num++;
-        //await Future.delayed(const Duration(milliseconds: 500));
         if (currentQuestionIndex <= widget.setToStudy.flashCards.length) {
           await runQuestion(false);
         }
-      } else if (action == "double") {
-        //await Future.delayed(const Duration(milliseconds: 500));
-        await runQuestion(
-          true,
-        ); // this will retry without repeating the definition
-      } else if (action == "cancel") {
-        return;
+      } else if (action == 'double') {
+        await runQuestion(true);
       }
+      return;
     }
-    // answer is wrong
-    else {
+
+    // ── Fuzzy match ──────────────────────────────────────────────────────────
+    final result = AnswerMatcher.match(userAnswer, expectedAnswer);
+    print('Match result: $result');
+
+    if (result.isCorrect) {
+      // ── Correct (exact, close, or stem match) ────────────────────────────
       setState(() {
-        bgdColor = Colors.red;
-        if (attempts == 1) {
-          wrongAnswers++;
-        }
-        print("wrong answers: $wrongAnswers");
+        bgdColor = Colors.green;
+        if (attempts == 1) correctAnswers++;
       });
 
-      await TTSSettings.tts.speak("Try again!");
-      //await Future.delayed(const Duration(milliseconds: 500));
-      await runQuestion(true); // retry the same question
+      // Give slightly different feedback depending on how close it was
+      if (result.score == 1.0) {
+        SemanticsAnnouncer.announce('Correct!', assertive: true);
+        await TTSSettings.tts.speak('Correct!');
+      } else {
+        // They were close — confirm the exact answer so they learn it
+        SemanticsAnnouncer.announce(
+          'Correct! The answer is $expectedAnswer.',
+          assertive: true,
+        );
+        await TTSSettings.tts.speak(
+          'Correct! The exact answer is $expectedAnswer.',
+        );
+      }
+
+      setState(() => currentQuestionIndex++);
+      num++;
+
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (currentQuestionIndex <= widget.setToStudy.flashCards.length) {
+        await runQuestion(false);
+      }
+    } else if (AnswerMatcher.isAlmostCorrect(result)) {
+      // ── Almost correct — give a nudge instead of just "try again" ────────
+      setState(() => bgdColor = Colors.orange);
+
+      SemanticsAnnouncer.announce(
+        "Almost! You said $userAnswer. Try once more.",
+        assertive: true,
+      );
+      await TTSSettings.tts.speak(
+        "Almost! You said $userAnswer. Try saying it once more.",
+      );
+
+      await runQuestion(true);
+    } else {
+      // ── Wrong ────────────────────────────────────────────────────────────
+      setState(() {
+        bgdColor = Colors.red;
+        if (attempts == 1) wrongAnswers++;
+      });
+
+      SemanticsAnnouncer.announce('Incorrect. Try again.', assertive: true);
+      await TTSSettings.tts.speak('Try again!');
+      await runQuestion(true);
     }
   }
 
   Future<void> endSession() async {
     TTSSettings.tts.stop();
     await STTService().stopListening();
+
     if (tapCompleter != null && !tapCompleter!.isCompleted) {
-      tapCompleter!.complete("cancel");
+      tapCompleter!.complete('cancel');
     }
 
-    showSummaryDialog();
-    await speakSummary();
+    if (mounted) {
+      showSummaryDialog();
+      await speakSummary();
+    }
 
     setState(() {
       isSessionActive = false;
@@ -254,147 +248,138 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
 
   Future<void> readQuestion() async {
     if (currentQuestionIndex >= widget.setToStudy.flashCards.length) return;
-
-    // setState(() {
-    //   showDefinition = false;
-    // });
-    String question =
+    final question =
         widget.setToStudy.flashCards[currentQuestionIndex].question;
-    await TTSSettings.tts.speak("The correct answer is: $question");
+    await TTSSettings.tts.speak('The correct answer is: $question');
     attempts = 1;
   }
 
   Future<void> readAnswer(int number) async {
     if (currentQuestionIndex >= widget.setToStudy.flashCards.length) return;
-
-    String answer = widget.setToStudy.flashCards[currentQuestionIndex].answer;
-    setState(() {
-      bgdColor = Colors.black;
-    });
-    await TTSSettings.tts.speak("Number $number : $answer");
-    setState(() {
-      bgdColor = const Color(0xFF364B9A);
-    });
+    final answer = widget.setToStudy.flashCards[currentQuestionIndex].answer;
+    setState(() => bgdColor = Colors.black);
+    await TTSSettings.tts.speak('Number $number: $answer');
+    setState(() => bgdColor = const Color(0xFF364B9A));
   }
 
   Future<void> speakSummary() async {
-    await TTSSettings.tts.speak("Do you want to hear your session summary?");
+    await TTSSettings.tts.speak('Do you want to hear your session summary?');
     await Future.delayed(const Duration(milliseconds: 500));
 
-    String response = await STTService().listenOnce();
-
-    if (response.contains("yes") || response.contains("sure")) {
+    final response = await STTService().listenOnce();
+    if (response.contains('yes') || response.contains('sure')) {
+      final total = correctAnswers + wrongAnswers;
       await TTSSettings.tts.speak(
-        "You got $correctAnswers correct and $wrongAnswers wrong out of ${correctAnswers + wrongAnswers} flashcards.",
+        'You got $correctAnswers correct and $wrongAnswers wrong '
+        'out of $total flashcards.',
       );
     } else {
-      await TTSSettings.tts.speak("Okay. Bye!");
+      await TTSSettings.tts.speak('Okay. Bye!');
     }
   }
 
   void showSummaryDialog() {
+    if (!mounted) return;
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Session Summary"),
-          content: Text(
-            "Correct: $correctAnswers\nWrong: $wrongAnswers\nTotal: ${wrongAnswers + correctAnswers}",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
+      builder: (context) => Semantics(
+        label: 'Session summary dialog',
+        child: AlertDialog(
+          title: const Text('Session Summary'),
+          content: Semantics(
+            label:
+                'You got $correctAnswers correct and $wrongAnswers wrong '
+                'out of ${correctAnswers + wrongAnswers} cards.',
+            child: Text(
+              'Correct: $correctAnswers\n'
+              'Wrong: $wrongAnswers\n'
+              'Total: ${correctAnswers + wrongAnswers}',
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text("Close"),
+            Semantics(
+              button: true,
+              label: 'Close summary',
+              child: TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Close'),
+              ),
             ),
           ],
-        );
-      },
+        ),
+      ),
     );
   }
 
-  @override
-  // Widget build(BuildContext context) {
-  //   return TextButton(
-  //     child: Text(isSessionActive ? 'End Session' : 'Start Session'),
-  //     onPressed: () {
-  //       if (isSessionActive) {
-  //         endSession();
-  //         tts.speak('Study session ended. Great job!');
-  //       } else {
-  //         startSession();
-  //       }
-  //     },
-  //   );
-  // }
-  Widget build(BuildContext context) {
-    int safeIndex = currentQuestionIndex;
+  // ─── Build ────────────────────────────────────────────────────────────────
 
-    if (safeIndex >= widget.setToStudy.flashCards.length) {
-      safeIndex = widget.setToStudy.flashCards.length - 1;
-    }
+  @override
+  Widget build(BuildContext context) {
+    final safeIndex = currentQuestionIndex.clamp(
+      0,
+      widget.setToStudy.flashCards.length - 1,
+    );
+
+    final currentCard = widget.setToStudy.flashCards[safeIndex];
+    final progressPercent =
+        ((safeIndex + 1) / widget.setToStudy.flashCards.length * 100).round();
 
     return GestureDetector(
       onTap: () {
         if (tapCompleter != null && !tapCompleter!.isCompleted) {
-          tapCompleter!.complete("tap");
+          tapCompleter!.complete('tap');
         }
-        setState(() {
-          // tap = true;
-          // doubleTap = false;
-        });
       },
       onDoubleTap: () {
         if (tapCompleter != null && !tapCompleter!.isCompleted) {
-          tapCompleter!.complete("double");
+          tapCompleter!.complete('double');
         }
-        setState(() {
-          // doubleTap = true;
-          // tap = false;
-        });
       },
       child: Scaffold(
         backgroundColor: bgdColor,
-
-        /// appBar: AppBar(title: Text("Study Session"), centerTitle: true),
         appBar: AppBar(
           backgroundColor: const Color(0xFF364B9A),
           foregroundColor: Colors.white,
-          title: Text("Study Session"),
+          title: Semantics(
+            header: true,
+            child: Text('Study Session — ${widget.setToStudy.name}'),
+          ),
           centerTitle: true,
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 10),
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 15,
+              child: Semantics(
+                button: true,
+                label: 'Open settings',
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 15,
+                    ),
+                    backgroundColor: const Color(0xFFFDB366),
+                    foregroundColor: const Color(0xFF364B9A),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
-                  backgroundColor: const Color(0xFFFDB366), // orange
-                  foregroundColor: const Color(0xFF364B9A), // navy text
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                  icon: const Icon(Icons.settings, size: 24),
+                  label: const Text(
+                    'Settings',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                ),
-                icon: const Icon(Icons.settings, size: 24),
-                label: const Text(
-                  "Settings",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                onPressed: () {
-                  Navigator.push(
+                  onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          ProfileScreen(onNameChanged: (name) {}),
+                      builder: (_) => ProfileScreen(onNameChanged: (name) {}),
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
             ),
           ],
@@ -402,153 +387,195 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "Studying: ${widget.setToStudy.name}",
-              style: TextStyle(
-                fontSize: 33,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+            // ── Header text ─────────────────────────────────────
+            ExcludeSemantics(
+              // Covered by the AppBar title
+              child: Text(
+                'Studying: ${widget.setToStudy.name}',
+                style: const TextStyle(
+                  fontSize: 33,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ),
-            SizedBox(height: 5),
-            Text(
-              "Tap the card to show the answer",
-              style: TextStyle(fontSize: 26, color: Colors.white70),
+            const SizedBox(height: 5),
+            ExcludeSemantics(
+              child: Text(
+                'Tap the card to show the answer',
+                style: const TextStyle(fontSize: 26, color: Colors.white70),
+              ),
             ),
-            SizedBox(height: 30),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  showDefinition = !showDefinition;
-                });
-              },
-              child: Card(
-                color: const Color(0xFFFDB366),
-                margin: EdgeInsets.all(16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      showDefinition
-                          ? Text(
-                              widget.setToStudy.flashCards[safeIndex].answer,
-                              style: TextStyle(
-                                fontSize: 30,
-                                color: const Color(
-                                  0xFF364B9A,
-                                ), // navy text on orange
-                              ),
-                              textAlign: TextAlign.center,
-                            )
-                          : Text(
-                              widget.setToStudy.flashCards[safeIndex].question,
-                              style: TextStyle(
-                                fontSize: 65,
-                                fontWeight: FontWeight.w900,
-                                color: const Color(0xFF364B9A),
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                    ],
+            const SizedBox(height: 30),
+
+            // ── Flash card ──────────────────────────────────────
+            Semantics(
+              label: showDefinition
+                  ? 'Definition: ${currentCard.answer}. Tap to show word.'
+                  : 'Word: ${currentCard.question}. Tap to show definition.',
+              button: true,
+              hint: 'Double tap to flip card',
+              child: GestureDetector(
+                onTap: () => setState(() => showDefinition = !showDefinition),
+                child: Card(
+                  color: const Color(0xFFFDB366),
+                  margin: const EdgeInsets.all(16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Center(
+                      child: ExcludeSemantics(
+                        // Parent Semantics handles the label
+                        child: Text(
+                          showDefinition
+                              ? currentCard.answer
+                              : currentCard.question,
+                          style: TextStyle(
+                            fontSize: showDefinition ? 30 : 65,
+                            fontWeight: showDefinition
+                                ? FontWeight.normal
+                                : FontWeight.w900,
+                            color: const Color(0xFF364B9A),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
 
-            Text(
-              "${safeIndex + 1} of ${widget.setToStudy.flashCards.length}",
-              style: TextStyle(fontSize: 25),
+            // ── Progress indicator ──────────────────────────────
+            Semantics(
+              label:
+                  'Card ${safeIndex + 1} of '
+                  '${widget.setToStudy.flashCards.length}',
+              child: Text(
+                '${safeIndex + 1} of ${widget.setToStudy.flashCards.length}',
+                style: const TextStyle(fontSize: 25, color: Colors.white),
+              ),
             ),
+            const SizedBox(height: 5),
 
-            SizedBox(height: 5),
-
+            // ── Navigation arrows ───────────────────────────────
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      if (currentQuestionIndex > 0) {
-                        currentQuestionIndex--;
-                        showDefinition = false;
-                      }
-                    });
-                  },
-                  icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+                Semantics(
+                  button: true,
+                  label: 'Previous card',
+                  enabled: currentQuestionIndex > 0,
+                  child: IconButton(
+                    onPressed: currentQuestionIndex > 0
+                        ? () => setState(() {
+                            currentQuestionIndex--;
+                            showDefinition = false;
+                          })
+                        : null,
+                    icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                    tooltip: 'Previous card',
+                  ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      if (currentQuestionIndex <
-                          widget.setToStudy.flashCards.length - 1) {
-                        currentQuestionIndex++;
-                        showDefinition = false;
-                      }
-                    });
-                  },
-                  icon: Icon(Icons.arrow_forward_ios, color: Colors.white),
+                Semantics(
+                  button: true,
+                  label: 'Next card',
+                  enabled:
+                      currentQuestionIndex <
+                      widget.setToStudy.flashCards.length - 1,
+                  child: IconButton(
+                    onPressed:
+                        currentQuestionIndex <
+                            widget.setToStudy.flashCards.length - 1
+                        ? () => setState(() {
+                            currentQuestionIndex++;
+                            showDefinition = false;
+                          })
+                        : null,
+                    icon: const Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.white,
+                    ),
+                    tooltip: 'Next card',
+                  ),
                 ),
               ],
             ),
 
-            SizedBox(height: 10),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFDB366), // orange
-                foregroundColor: const Color(0xFF364B9A), // navy text
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 50,
-                  vertical: 20,
+            const SizedBox(height: 10),
+
+            // ── Start / End session button ──────────────────────
+            Semantics(
+              button: true,
+              label: isSessionActive
+                  ? 'End study session'
+                  : 'Start study session',
+              hint: isSessionActive
+                  ? 'Stops the audio study session'
+                  : 'Begins audio study session for '
+                        '${widget.setToStudy.name}',
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFDB366),
+                  foregroundColor: const Color(0xFF364B9A),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 50,
+                    vertical: 20,
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                 ),
-                textStyle: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-                shape: RoundedRectangleBorder(
+                onPressed: () {
+                  if (isSessionActive) {
+                    endSession();
+                  } else {
+                    startSession();
+                  }
+                },
+                child: Text(isSessionActive ? 'End Session' : 'Start Session'),
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // ── Progress bar ────────────────────────────────────
+            Semantics(
+              label: '$progressPercent percent completed',
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(15),
                 ),
-              ),
-              child: Text(isSessionActive ? 'End Session' : 'Start Session'),
-              onPressed: () {
-                if (isSessionActive) {
-                  endSession();
-                  TTSSettings.tts.speak('Study session ended. Great job!');
-                } else {
-                  startSession();
-                }
-              },
-            ),
-            SizedBox(height: 30),
-
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              child: Padding(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    LinearProgressIndicator(
-                      value:
-                          (safeIndex + 1) / widget.setToStudy.flashCards.length,
-                      minHeight: 10,
-                      backgroundColor: Colors.grey[300],
-                      color: const Color(0xFFFDB366),
-                    ),
-
-                    SizedBox(height: 8),
-
-                    Text(
-                      "${(((safeIndex + 1) / widget.setToStudy.flashCards.length) * 100).round()}% completed",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    ExcludeSemantics(
+                      child: LinearProgressIndicator(
+                        value:
+                            (safeIndex + 1) /
+                            widget.setToStudy.flashCards.length,
+                        minHeight: 10,
+                        backgroundColor: Colors.grey[300],
                         color: const Color(0xFFFDB366),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    ExcludeSemantics(
+                      child: Text(
+                        '$progressPercent% completed',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFFDB366),
+                        ),
                       ),
                     ),
                   ],

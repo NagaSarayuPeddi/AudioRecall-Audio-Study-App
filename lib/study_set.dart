@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'flash_card.dart';
 import 'cards_page.dart';
 import 'services/stt_service.dart';
+import 'widgets/accessible_mic_button.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 class StudySet {
@@ -10,7 +11,7 @@ class StudySet {
   String name;
   String description;
   List<FlashCard> flashCards;
-  bool isEditing = true; // controls Done vs Trash
+  bool isEditing;
 
   StudySet({
     required this.id,
@@ -23,7 +24,6 @@ class StudySet {
 
 class SetWidget extends StatefulWidget {
   final StudySet set;
-  // final void Function(StudySet set)? onDelete;
   final void Function(StudySet set) onDelete;
 
   const SetWidget({super.key, required this.set, required this.onDelete});
@@ -33,8 +33,8 @@ class SetWidget extends StatefulWidget {
 }
 
 class _SetWidgetState extends State<SetWidget> {
-  TextEditingController? nameController;
-  TextEditingController? descriptionController;
+  late final TextEditingController nameController;
+  late final TextEditingController descriptionController;
 
   final stt = STTService();
   bool isListeningDescription = false;
@@ -42,305 +42,211 @@ class _SetWidgetState extends State<SetWidget> {
 
   final FlutterTts tts = FlutterTts();
 
-  void donePressed() {
-    setState(() {
-      widget.set.isEditing = false;
-      widget.set.name = nameController!.text;
-      widget.set.description = descriptionController!.text;
-    });
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => CardPage(cardSet: widget.set)),
-    );
-  }
-
   @override
   void initState() {
     super.initState();
     nameController = TextEditingController(text: widget.set.name);
     descriptionController = TextEditingController(text: widget.set.description);
-
     stt.initialize();
   }
 
   @override
+  void dispose() {
+    nameController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
+
+  void _donePressed() {
+    setState(() {
+      widget.set.isEditing = false;
+      widget.set.name = nameController.text;
+      widget.set.description = descriptionController.text;
+    });
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => CardPage(cardSet: widget.set)),
+    );
+  }
+
+  Future<void> _toggleNameMic() async {
+    if (!isListeningName) {
+      await tts.speak('Microphone on. Speak the set name.');
+      setState(() => isListeningName = true);
+      await stt.listen(
+        onResult: (text) => setState(() => nameController.text = text),
+      );
+    } else {
+      await tts.speak('Microphone off.');
+      await stt.stopListening();
+      setState(() => isListeningName = false);
+    }
+  }
+
+  Future<void> _toggleDescriptionMic() async {
+    if (!isListeningDescription) {
+      final available = await stt.initialize();
+      if (!available) {
+        await tts.speak('Microphone not available.');
+        return;
+      }
+      await tts.speak('Microphone on. Speak the description.');
+      setState(() => isListeningDescription = true);
+      await stt.listen(
+        onResult: (text) => setState(() => descriptionController.text = text),
+      );
+    } else {
+      await tts.speak('Microphone off.');
+      await stt.stopListening();
+      setState(() => isListeningDescription = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: () {
-        if (!widget.set.isEditing) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CardPage(cardSet: widget.set),
-            ),
-          );
-        }
-      },
-      style: TextButton.styleFrom(padding: EdgeInsets.zero),
-      child: Card(
-        color: const Color(0xFFFDB366),
-        margin: const EdgeInsets.all(10),
-        child: Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Builder(
-                builder: (context) {
-                  if (widget.set.isEditing) {
-                    return Row(
-                      children: [
-                        Text(
-                          "Set Name: ",
+    return Semantics(
+      // When not editing, give the card a clear summary label
+      label: widget.set.isEditing
+          ? 'New study set'
+          : 'Study set: ${widget.set.name}, '
+                '${widget.set.flashCards.length} cards. '
+                'Double tap to open.',
+      button: !widget.set.isEditing,
+      container: true,
+      child: TextButton(
+        onPressed: widget.set.isEditing
+            ? null
+            : () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => CardPage(cardSet: widget.set),
+                ),
+              ),
+        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+        child: Card(
+          color: const Color(0xFFFDB366),
+          margin: const EdgeInsets.all(10),
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Name row ──────────────────────────────────────
+                if (widget.set.isEditing)
+                  Row(
+                    children: [
+                      ExcludeSemantics(
+                        child: Text(
+                          'Set Name: ',
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
-                        const SizedBox(width: 10),
-                        TextField(
-                          controller: nameController,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            hintText: 'Enter set name',
-                            labelText: 'Set Name',
-                          ),
-                        ),
-                        // Expanded(
-                        //   child: Builder(
-                        //     builder: (context) {
-                        //       if (widget.set.isEditing) {
-                        //         return TextField(
-                        //           controller: nameController,
-                        //           decoration: const InputDecoration(
-                        //             border: OutlineInputBorder(),
-                        //             hintText: 'Enter set name',
-                        //             labelText: 'Set Name',
-                        //           ),
-                        //         );
-                        //       } else {
-                        //         return Text(
-                        //           widget.set.name,
-                        //           style: Theme.of(context).textTheme.titleLarge,
-                        //         );
-                        //       }
-                        //     },
-                        //   ),
-                        // ),
-                        // Builder(
-                        //   builder: (context) {
-                        //     if (widget.set.isEditing) {
-                        //       return
-                        GestureDetector(
-                          onTap: () async {
-                            if (!isListeningName) {
-                              // Initialize speech-to-text first
-                              // bool available = await stt.initialize();
-                              // if (!available) {
-                              //   print(
-                              //     "Microphone not available or permission denied",
-                              //   );
-                              //   return;
-                              // }
-                              await tts.speak(
-                                "Microphone activated. Start speaking the set name.",
-                              );
-                              // Start listening
-                              setState(() => isListeningName = true);
-                              await stt.listen(
-                                onResult: (text) {
-                                  setState(() {
-                                    nameController!.text = text;
-                                  });
-                                },
-                              );
-                            } else {
-                              // Stop listening
-                              await tts.speak("Microphone deactivated.");
-                              stt.stopListening();
-                              setState(() => isListeningName = false);
-                            }
-                          },
-                          child: Container(
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              color: Colors.purple,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              isListeningName ? Icons.mic : Icons.mic_none,
-                              color: Colors.white,
-                              size: 50,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Semantics(
+                          label: 'Set name field',
+                          textField: true,
+                          child: TextField(
+                            controller: nameController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter set name',
+                              labelText: 'Set Name',
                             ),
                           ),
-                          // child: IconButton(
-                          //   icon: Icon(isListening ? Icons.mic : Icons.mic_none),
-                          // onPressed: () async {
-                          //   if (!isListening) {
-                          //     // Initialize speech-to-text first
-                          //     bool available = await stt.initialize();
-                          //     if (!available) {
-                          //       print(
-                          //         "Microphone not available or permission denied",
-                          //       );
-                          //       return;
-                          //     }
-
-                          //     // Start listening
-                          //     setState(() => isListening = true);
-                          //     stt.startListening((text) {
-                          //       setState(() {
-                          //         nameController!.text = text;
-                          //       });
-                          //     });
-                          //   } else {
-                          //     // Stop listening
-                          //     stt.stopListening();
-                          //     setState(() => isListening = false);
-                          //   }
-                          // },
-                          //),
                         ),
-                        // } else {
-                        //   return const SizedBox.shrink();
-                        // }
-                        //   },
-                        // ),
-                      ],
-                    );
-                  } else {
-                    // return Text(
-                    //   widget.set.name,
-                    //   style: Theme.of(context).textTheme.titleLarge,
-                    //   );
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
+                      ),
+                      const SizedBox(width: 8),
+                      AccessibleMicButton(
+                        isListening: isListeningName,
+                        fieldLabel: 'set name',
+                        onTap: _toggleNameMic,
+                      ),
+                    ],
+                  )
+                else
+                  // Shown set name with delete button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: ExcludeSemantics(
+                          // Parent Semantics node covers this
                           child: Text(
                             widget.set.name,
                             style: GoogleFonts.poppins(
                               fontSize: 30,
                               fontWeight: FontWeight.w700,
-                              color: const Color(0xFF364B9A), // navy
+                              color: const Color(0xFF364B9A),
                             ),
                           ),
                         ),
-                        Container(
+                      ),
+                      Semantics(
+                        button: true,
+                        label: 'Delete ${widget.set.name}',
+                        hint: 'Permanently removes this study set',
+                        child: Container(
                           width: 70,
                           height: 70,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
                           child: IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
                             iconSize: 30,
-                            onPressed: () {
-                              widget.onDelete.call(widget.set);
-                            },
+                            tooltip: 'Delete set',
+                            onPressed: () => widget.onDelete.call(widget.set),
                           ),
                         ),
-                      ],
-                    );
-                  }
-                },
-              ),
-              const SizedBox(height: 10),
+                      ),
+                    ],
+                  ),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: Builder(
-                      builder: (context) {
-                        if (widget.set.isEditing) {
-                          return TextField(
+                const SizedBox(height: 10),
+
+                // ── Description row (editing only) ────────────────
+                if (widget.set.isEditing)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Semantics(
+                          label: 'Description field',
+                          textField: true,
+                          child: TextField(
                             controller: descriptionController,
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               hintText: 'Enter description',
                               labelText: 'Description',
                             ),
-                          );
-                        } else {
-                          // return Text(
-                          //   widget.set.description,
-                          //   style: Theme.of(context).textTheme.displaySmall,
-                          // );
-                          return SizedBox(width: 0, height: 0);
-                        }
-                      },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      AccessibleMicButton(
+                        isListening: isListeningDescription,
+                        fieldLabel: 'description',
+                        onTap: _toggleDescriptionMic,
+                      ),
+                    ],
+                  ),
+
+                const SizedBox(height: 10),
+
+                // ── Done button ───────────────────────────────────
+                if (widget.set.isEditing)
+                  Semantics(
+                    button: true,
+                    label: 'Save set and add cards',
+                    child: TextButton(
+                      onPressed: _donePressed,
+                      child: const Text('Done'),
                     ),
                   ),
-                  Builder(
-                    builder: (context) {
-                      if (widget.set.isEditing) {
-                        return GestureDetector(
-                          onTap: () async {
-                            if (!isListeningDescription) {
-                              // Initialize speech-to-text first
-                              bool available = await stt.initialize();
-                              if (!available) {
-                                print(
-                                  "Microphone not available or permission denied",
-                                );
-                                return;
-                              }
-
-                              await tts.speak(
-                                "Microphone activated. Start speaking the description.",
-                              );
-
-                              // Start listening
-                              setState(() => isListeningDescription = true);
-                              await stt.listen(
-                                onResult: (text) {
-                                  setState(() {
-                                    descriptionController!.text = text;
-                                  });
-                                },
-                              );
-                            } else {
-                              await tts.speak("Microphone deactivated.");
-                              // Stop listening
-                              stt.stopListening();
-                              setState(() => isListeningDescription = false);
-                            }
-                          },
-                          child: Container(
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              color: Colors.purple,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              isListeningDescription
-                                  ? Icons.mic
-                                  : Icons.mic_none,
-                              color: Colors.white,
-                              size: 50,
-                            ),
-                          ),
-                        );
-                      } else {
-                        return const SizedBox.shrink();
-                      }
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  if (widget.set.isEditing)
-                    TextButton(
-                      onPressed: donePressed,
-                      child: const Text('Done'),
-                    )
-                  else
-                    const SizedBox(),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
