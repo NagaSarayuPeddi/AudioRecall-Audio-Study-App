@@ -1,6 +1,6 @@
-# EchoLearn
+# VocalSign : AI Study Companion
 
-EchoLearn is an audio-first study application built with Flutter to make
+VocalSign is an audio-first study application built with Flutter to make
 flashcard-based learning more accessible for students who benefit from
 voice-guided interaction, including students with visual impairments.
 
