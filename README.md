@@ -28,7 +28,7 @@ Accessibility settings.
 2. The learner answers using their voice.
 3. The app asks how many flashcards to generate.
 4. An AI service creates a customized study set.
-5. EchoLearn reads confirmation and study content aloud.
+5. VocalSign reads confirmation and study content aloud.
 6. The study set is saved locally for future sessions.
 
 ## Features
