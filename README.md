@@ -1,16 +1,44 @@
-# study_app
+# EchoLearn
 
-A new Flutter project.
+EchoLearn is an audio-first study application built with Flutter to make
+flashcard-based learning more accessible for students who benefit from
+voice-guided interaction, including students with visual impairments.
 
-## Getting Started
+Users can create study sets using voice commands, generate flashcards with AI,
+import CSV study materials, listen to questions and answers through text-to-speech,
+and save study sets for future use.
 
-This project is a starting point for a Flutter application.
+screenshots/
+├── home-screen.png
+├── study-sets.png
+├── audio-flashcard.png
+├── ai-generation.png
+└── settings.png
+The screenshots should show:
 
-A few resources to get you started if this is your first Flutter project:
+Home screen.
+Voice-guided AI generation.
+Flashcard study screen.
+Built-in or imported study sets.
+Accessibility settings.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Audio-First Study Workflow
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. EchoLearn asks the learner for a study topic.
+2. The learner answers using their voice.
+3. The app asks how many flashcards to generate.
+4. An AI service creates a customized study set.
+5. EchoLearn reads confirmation and study content aloud.
+6. The study set is saved locally for future sessions.
+
+## Features
+
+- Voice-guided navigation using text-to-speech.
+- Speech-to-text input for hands-free study-set creation.
+- AI-generated flashcards based on a chosen topic.
+- CSV import for teacher-created or student-created materials.
+- Built-in sets for computer science, economics, geography, psychology,
+  and SAT vocabulary.
+- Local persistence so user-created sets remain available between sessions.
+- Editable and removable study sets.
+- Accessible visual design with large typography and high-contrast colors.
