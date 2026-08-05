@@ -1,8 +1,10 @@
+import 'package:assisted_learning/home_screen.dart';
+import 'package:assisted_learning/sets_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'flash_card.dart';
-import 'study_set.dart';
+//import 'widgets/study_set.dart';
 import 'dart:convert';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
@@ -83,165 +85,165 @@ class MyApp extends StatelessWidget {
 
 // ─── Home screen ────────────────────────────────────────────────────────────
 
-class HomeScreen extends StatelessWidget {
-  final String userName;
-  final VoidCallback onCreateSetButtonPressed;
-  final void Function(StudySet newSet) onAddSet;
+// class HomeScreen extends StatelessWidget {
+//   final String userName;
+//   final VoidCallback onCreateSetButtonPressed;
+//   final void Function(StudySet newSet) onAddSet;
 
-  const HomeScreen({
-    super.key,
-    required this.onCreateSetButtonPressed,
-    required this.onAddSet,
-    required this.userName,
-  });
+//   const HomeScreen({
+//     super.key,
+//     required this.onCreateSetButtonPressed,
+//     required this.onAddSet,
+//     required this.userName,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF364B9A),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Center(
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-              Text(
-                'Welcome to EchoLearn!',
-                style: GoogleFonts.poppins(
-                  textStyle: Theme.of(context).textTheme.titleLarge,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              Container(
-                width: 300,
-                height: 120,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF364B9A),
-                  shape: BoxShape.circle,
-                ),
-                child: Image.asset(
-                  'assets/images/echolearn.png',
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  final navBarState = context
-                      .findAncestorStateOfType<BottomNavBarState>();
-                  navBarState?.onIconPressed(3);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFDB366),
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 30,
-                    vertical: 17,
-                  ),
-                ),
-                child: Text(
-                  "I'm new",
-                  style: GoogleFonts.poppins(
-                    textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: const Color(0xFF364B9A),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Divider(
-                color: const Color(0xFFFDB366),
-                thickness: 3,
-                indent: 16,
-                endIndent: 16,
-              ),
-              const SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: () async {
-                  final nSet = await importCsvAndCreateSet();
-                  if (nSet != null) onAddSet(nSet);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFDB366),
-                  foregroundColor: Colors.black,
-                  shadowColor: Colors.black,
-                  elevation: 10.0,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 30,
-                    vertical: 30,
-                  ),
-                ),
-                child: Text(
-                  'Import CSV',
-                  style: GoogleFonts.poppins(
-                    textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: const Color(0xFF364B9A),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  await TTSSettings.tts.speak(
-                    "What's the topic you want to study?",
-                  );
-                  await Future.delayed(const Duration(milliseconds: 500));
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: const Color(0xFF364B9A),
+//       body: Padding(
+//         padding: const EdgeInsets.all(20.0),
+//         child: Center(
+//           child: Column(
+//             children: [
+//               const SizedBox(height: 10),
+//               Text(
+//                 'Welcome to EchoLearn!',
+//                 style: GoogleFonts.poppins(
+//                   textStyle: Theme.of(context).textTheme.titleLarge,
+//                 ),
+//                 textAlign: TextAlign.center,
+//               ),
+//               const SizedBox(height: 20),
+//               Container(
+//                 width: 300,
+//                 height: 120,
+//                 decoration: const BoxDecoration(
+//                   color: Color(0xFF364B9A),
+//                   shape: BoxShape.circle,
+//                 ),
+//                 child: Image.asset(
+//                   'assets/images/echolearn.png',
+//                   fit: BoxFit.cover,
+//                 ),
+//               ),
+//               const SizedBox(height: 20),
+//               ElevatedButton(
+//                 onPressed: () {
+//                   final navBarState = context
+//                       .findAncestorStateOfType<BottomNavBarState>();
+//                   navBarState?.onIconPressed(3);
+//                 },
+//                 style: ElevatedButton.styleFrom(
+//                   backgroundColor: const Color(0xFFFDB366),
+//                   foregroundColor: Colors.black,
+//                   padding: const EdgeInsets.symmetric(
+//                     horizontal: 30,
+//                     vertical: 17,
+//                   ),
+//                 ),
+//                 child: Text(
+//                   "I'm new",
+//                   style: GoogleFonts.poppins(
+//                     textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
+//                       color: const Color(0xFF364B9A),
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//               const SizedBox(height: 20),
+//               Divider(
+//                 color: const Color(0xFFFDB366),
+//                 thickness: 3,
+//                 indent: 16,
+//                 endIndent: 16,
+//               ),
+//               const SizedBox(height: 40),
+//               ElevatedButton(
+//                 onPressed: () async {
+//                   final nSet = await importCsvAndCreateSet();
+//                   if (nSet != null) onAddSet(nSet);
+//                 },
+//                 style: ElevatedButton.styleFrom(
+//                   backgroundColor: const Color(0xFFFDB366),
+//                   foregroundColor: Colors.black,
+//                   shadowColor: Colors.black,
+//                   elevation: 10.0,
+//                   padding: const EdgeInsets.symmetric(
+//                     horizontal: 30,
+//                     vertical: 30,
+//                   ),
+//                 ),
+//                 child: Text(
+//                   'Import CSV',
+//                   style: GoogleFonts.poppins(
+//                     textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
+//                       color: const Color(0xFF364B9A),
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//               const SizedBox(height: 20),
+//               ElevatedButton(
+//                 onPressed: () async {
+//                   await TTSSettings.tts.speak(
+//                     "What's the topic you want to study?",
+//                   );
+//                   await Future.delayed(const Duration(milliseconds: 500));
 
-                  final topic = await STTService().listenOnce();
-                  if (topic.isEmpty) return;
+//                   final topic = await STTService().listenOnce();
+//                   if (topic.isEmpty) return;
 
-                  await TTSSettings.tts.speak(
-                    'How many flashcards do you want in your set?',
-                  );
-                  await Future.delayed(const Duration(milliseconds: 500));
+//                   await TTSSettings.tts.speak(
+//                     'How many flashcards do you want in your set?',
+//                   );
+//                   await Future.delayed(const Duration(milliseconds: 500));
 
-                  final num = await STTService().listenOnce();
+//                   final num = await STTService().listenOnce();
 
-                  // Tell user we're loading — important for audio-first UX
-                  await TTSSettings.tts.speak('Loading your set. Please wait.');
+//                   // Tell user we're loading — important for audio-first UX
+//                   await TTSSettings.tts.speak('Loading your set. Please wait.');
 
-                  final newSet = await AIService.generateStudySet(topic, num);
-                  if (newSet != null) {
-                    onAddSet(newSet);
-                    await TTSSettings.tts.speak(
-                      'Your ${newSet.name} set is ready with '
-                      '${newSet.flashCards.length} cards.',
-                    );
-                  } else {
-                    // Give audio feedback on failure
-                    await TTSSettings.tts.speak(
-                      'Sorry, I could not generate the set. '
-                      'Please check your internet connection and try again.',
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFDB366),
-                  foregroundColor: Colors.black,
-                  shadowColor: Colors.black,
-                  elevation: 10.0,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 30,
-                    vertical: 30,
-                  ),
-                ),
-                child: Text(
-                  'Generate with AI',
-                  style: GoogleFonts.poppins(
-                    textStyle: Theme.of(context).textTheme.titleMedium
-                        ?.copyWith(color: const Color(0xFF364B9A)),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+//                   final newSet = await AIService.generateStudySet(topic, num);
+//                   if (newSet != null) {
+//                     onAddSet(newSet);
+//                     await TTSSettings.tts.speak(
+//                       'Your ${newSet.name} set is ready with '
+//                       '${newSet.flashCards.length} cards.',
+//                     );
+//                   } else {
+//                     // Give audio feedback on failure
+//                     await TTSSettings.tts.speak(
+//                       'Sorry, I could not generate the set. '
+//                       'Please check your internet connection and try again.',
+//                     );
+//                   }
+//                 },
+//                 style: ElevatedButton.styleFrom(
+//                   backgroundColor: const Color(0xFFFDB366),
+//                   foregroundColor: Colors.black,
+//                   shadowColor: Colors.black,
+//                   elevation: 10.0,
+//                   padding: const EdgeInsets.symmetric(
+//                     horizontal: 30,
+//                     vertical: 30,
+//                   ),
+//                 ),
+//                 child: Text(
+//                   'Generate with AI',
+//                   style: GoogleFonts.poppins(
+//                     textStyle: Theme.of(context).textTheme.titleMedium
+//                         ?.copyWith(color: const Color(0xFF364B9A)),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 // ─── Bottom nav shell ────────────────────────────────────────────────────────
 
@@ -371,65 +373,65 @@ class BottomNavBarState extends State<BottomNavBar> {
 
 // ─── Sets screen ─────────────────────────────────────────────────────────────
 
-class SetsScreen extends StatelessWidget {
-  final List<StudySet> sets;
-  final void Function(StudySet setToDelete) onDelete;
+// class SetsScreen extends StatelessWidget {
+//   final List<StudySet> sets;
+//   final void Function(StudySet setToDelete) onDelete;
 
-  const SetsScreen({super.key, required this.sets, required this.onDelete});
+//   const SetsScreen({super.key, required this.sets, required this.onDelete});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF364B9A),
-      appBar: AppBar(title: const Text('Sets')),
-      body: sets.isEmpty
-          ? Center(
-              child: Text(
-                'No sets yet.\nImport a CSV or generate one with AI!',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(color: Colors.white70, fontSize: 18),
-              ),
-            )
-          : ListView.builder(
-              itemCount: sets.length,
-              itemBuilder: (context, index) {
-                return SetWidget(
-                  key: ValueKey(sets[index].id),
-                  set: sets[index],
-                  onDelete: (setToDelete) {
-                    showDialog(
-                      context: context,
-                      builder: (dialogContext) => AlertDialog(
-                        content: const Text(
-                          'Are you sure you want to delete this set?',
-                          style: TextStyle(fontSize: 20, color: Colors.black),
-                          textAlign: TextAlign.center,
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(dialogContext),
-                            child: const Text('Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              onDelete(setToDelete);
-                              Navigator.pop(dialogContext);
-                            },
-                            child: const Text(
-                              'Delete',
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: const Color(0xFF364B9A),
+//       appBar: AppBar(title: const Text('Sets')),
+//       body: sets.isEmpty
+//           ? Center(
+//               child: Text(
+//                 'No sets yet.\nImport a CSV or generate one with AI!',
+//                 textAlign: TextAlign.center,
+//                 style: GoogleFonts.poppins(color: Colors.white70, fontSize: 18),
+//               ),
+//             )
+//           : ListView.builder(
+//               itemCount: sets.length,
+//               itemBuilder: (context, index) {
+//                 return SetWidget(
+//                   key: ValueKey(sets[index].id),
+//                   set: sets[index],
+//                   onDelete: (setToDelete) {
+//                     showDialog(
+//                       context: context,
+//                       builder: (dialogContext) => AlertDialog(
+//                         content: const Text(
+//                           'Are you sure you want to delete this set?',
+//                           style: TextStyle(fontSize: 20, color: Colors.black),
+//                           textAlign: TextAlign.center,
+//                         ),
+//                         actions: [
+//                           TextButton(
+//                             onPressed: () => Navigator.pop(dialogContext),
+//                             child: const Text('Cancel'),
+//                           ),
+//                           TextButton(
+//                             onPressed: () {
+//                               onDelete(setToDelete);
+//                               Navigator.pop(dialogContext);
+//                             },
+//                             child: const Text(
+//                               'Delete',
+//                               style: TextStyle(color: Colors.red),
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     );
+//                   },
+//                 );
+//               },
+//             ),
+//     );
+//   }
+// }
 
 // ─── Built-in CSV loader ──────────────────────────────────────────────────────
 
@@ -479,6 +481,7 @@ Future<StudySet> _loadCsvAsStudySet(String path, String setName) async {
     description: '',
     name: setName,
     flashCards: cards,
+    isEditing: false,
   );
 }
 
@@ -513,5 +516,11 @@ Future<StudySet?> importCsvAndCreateSet() async {
     );
   }
 
-  return StudySet(id: '', description: '', name: setName, flashCards: cards);
+  return StudySet(
+    id: '',
+    description: '',
+    name: setName,
+    flashCards: cards,
+    isEditing: false,
+  );
 }

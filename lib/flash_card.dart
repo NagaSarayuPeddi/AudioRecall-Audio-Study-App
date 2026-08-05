@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:assisted_learning/services/tts_service.dart';
-import 'services/stt_service.dart';
-import 'widgets/accessible_mic_button.dart';
-import 'package:flutter_tts/flutter_tts.dart';
+import 'package:assisted_learning/services/stt_service.dart';
+import 'package:assisted_learning/widgets/accessible_mic_button.dart';
 
 class FlashCard {
   final String id;
@@ -41,8 +40,6 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
   bool isListeningAnswer = false;
   bool isListeningQuestion = false;
 
-  final FlutterTts tts = FlutterTts();
-
   @override
   void initState() {
     super.initState();
@@ -69,16 +66,15 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
     if (!isListeningQuestion) {
       final available = await stt.initialize();
       if (!available) {
-        await tts.speak('Microphone not available. Please check permissions.');
+        await TTSSettings.tts.speak('Microphone not available.');
         return;
       }
-      await tts.speak('Microphone on. Speak the word.');
+      await TTSSettings.tts.speak('Speak the word.');
       setState(() => isListeningQuestion = true);
       await stt.listen(
-        onResult: (text) => setState(() => questionController.text = text),
+        onResult: (t) => setState(() => questionController.text = t),
       );
     } else {
-      await tts.speak('Microphone off.');
       await stt.stopListening();
       setState(() => isListeningQuestion = false);
     }
@@ -88,16 +84,15 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
     if (!isListeningAnswer) {
       final available = await stt.initialize();
       if (!available) {
-        await tts.speak('Microphone not available. Please check permissions.');
+        await TTSSettings.tts.speak('Microphone not available.');
         return;
       }
-      await tts.speak('Microphone on. Speak the definition.');
+      await TTSSettings.tts.speak('Speak the definition.');
       setState(() => isListeningAnswer = true);
       await stt.listen(
-        onResult: (text) => setState(() => answerController.text = text),
+        onResult: (t) => setState(() => answerController.text = t),
       );
     } else {
-      await tts.speak('Microphone off.');
       await stt.stopListening();
       setState(() => isListeningAnswer = false);
     }
@@ -106,9 +101,6 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      // Give the whole card a summary label when not editing,
-      // so VoiceOver reads "Flash card: Supply. Definition: Amount of a
-      // product available." as a single unit.
       label: widget.flashCard.isEditing
           ? 'Edit flash card'
           : 'Flash card: ${widget.flashCard.question}. '
@@ -116,90 +108,87 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
       container: true,
       child: Card(
         color: const Color(0xFFFDB366),
-        margin: const EdgeInsets.all(10),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         child: Padding(
-          padding: const EdgeInsets.all(15.0),
+          padding: const EdgeInsets.all(14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Word / Question row ──────────────────────────────
+              // ── Word row ────────────────────────────────────
               if (widget.flashCard.isEditing)
                 Row(
                   children: [
                     Expanded(
-                      child: Semantics(
-                        label: 'Word field',
-                        textField: true,
-                        child: TextField(
-                          controller: questionController,
-                          style: const TextStyle(
-                            color: Color(0xFF364B9A),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18,
-                          ),
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            hintText: 'Enter a word',
-                            hintStyle: TextStyle(color: Color(0xFF364B9A)),
-                            labelText: 'Word',
-                            labelStyle: TextStyle(color: Color(0xFF364B9A)),
-                          ),
+                      child: TextField(
+                        controller: questionController,
+                        style: const TextStyle(
+                          color: Color(0xFF364B9A),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Enter a word',
+                          hintStyle: TextStyle(color: Color(0xFF364B9A)),
+                          labelText: 'Word',
+                          labelStyle: TextStyle(color: Color(0xFF364B9A)),
+                          isDense: true,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 8),
+                    // Fixed: 48×48 instead of 80×80
                     AccessibleMicButton(
                       isListening: isListeningQuestion,
                       fieldLabel: 'word',
                       onTap: _toggleQuestionMic,
+                      size: 48,
                     ),
                   ],
                 )
               else
                 ExcludeSemantics(
-                  // Excluded because the parent Semantics container
-                  // already reads word + definition together
                   child: Text(
                     widget.flashCard.question,
-                    style: const TextStyle(
-                      color: Color(0xFF364B9A),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 32,
+                    style: GoogleFonts.poppins(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF364B9A),
                     ),
                   ),
                 ),
 
-              const SizedBox(height: 15),
+              const SizedBox(height: 10),
 
-              // ── Definition / Answer row ──────────────────────────
+              // ── Definition row ──────────────────────────────
               if (widget.flashCard.isEditing)
                 Row(
                   children: [
                     Expanded(
-                      child: Semantics(
-                        label: 'Definition field',
-                        textField: true,
-                        child: TextField(
-                          controller: answerController,
-                          style: const TextStyle(
-                            color: Color(0xFF364B9A),
-                            fontSize: 18,
-                          ),
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            hintText: 'Enter the definition',
-                            hintStyle: TextStyle(color: Color(0xFF364B9A)),
-                            labelText: 'Definition',
-                            labelStyle: TextStyle(color: Color(0xFF364B9A)),
-                          ),
+                      child: TextField(
+                        controller: answerController,
+                        style: const TextStyle(
+                          color: Color(0xFF364B9A),
+                          fontSize: 15,
                         ),
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Enter the definition',
+                          hintStyle: TextStyle(color: Color(0xFF364B9A)),
+                          labelText: 'Definition',
+                          labelStyle: TextStyle(color: Color(0xFF364B9A)),
+                          isDense: true,
+                        ),
+                        maxLines: 2,
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 8),
                     AccessibleMicButton(
                       isListening: isListeningAnswer,
                       fieldLabel: 'definition',
                       onTap: _toggleAnswerMic,
+                      size: 48,
                     ),
                   ],
                 )
@@ -208,8 +197,7 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                   child: Text(
                     widget.flashCard.answer,
                     style: GoogleFonts.poppins(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
                       color: const Color(0xFF364B9A),
                     ),
                   ),
@@ -217,41 +205,41 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
 
               const SizedBox(height: 10),
 
-              // ── Action buttons row ───────────────────────────────
+              // ── Action row ──────────────────────────────────
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   if (widget.flashCard.isEditing)
-                    Semantics(
-                      button: true,
-                      label: 'Save card',
-                      child: TextButton(
-                        onPressed: _onDonePressed,
-                        child: const Text('Done'),
+                    TextButton(
+                      onPressed: _onDonePressed,
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF364B9A),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                      ),
+                      child: const Text(
+                        'Save',
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     )
                   else
                     Semantics(
                       button: true,
                       label: 'Delete this card',
-                      hint: 'Removes ${widget.flashCard.question} from the set',
-                      child: Container(
-                        width: 70,
-                        height: 70,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Colors.red,
                         ),
-                        child: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          iconSize: 30,
-                          tooltip: 'Delete card',
-                          onPressed: () {
-                            if (widget.onDeleteCard != null) {
-                              widget.onDeleteCard!(widget.flashCard);
-                            }
-                          },
-                        ),
+                        iconSize: 22,
+                        onPressed: () {
+                          if (widget.onDeleteCard != null) {
+                            widget.onDeleteCard!(widget.flashCard);
+                          }
+                        },
+                        tooltip: 'Delete',
                       ),
                     ),
 
@@ -259,24 +247,19 @@ class _FlashCardWidgetState extends State<FlashCardWidget> {
                     button: true,
                     label:
                         'Read aloud: ${widget.flashCard.question}, ${widget.flashCard.answer}',
-                    child: Container(
-                      width: 70,
-                      height: 70,
-                      decoration: const BoxDecoration(
-                        color: Colors.purple,
-                        shape: BoxShape.circle,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.volume_up_outlined,
+                        color: Color(0xFF364B9A),
                       ),
-                      child: IconButton(
-                        icon: const Icon(Icons.volume_up, color: Colors.white),
-                        iconSize: 40,
-                        tooltip: 'Read card aloud',
-                        onPressed: () async {
-                          await TTSSettings.tts.speak(
-                            '${widget.flashCard.question}: '
-                            '${widget.flashCard.answer}',
-                          );
-                        },
-                      ),
+                      iconSize: 22,
+                      onPressed: () async {
+                        await TTSSettings.tts.speak(
+                          '${widget.flashCard.question}: '
+                          '${widget.flashCard.answer}',
+                        );
+                      },
+                      tooltip: 'Read aloud',
                     ),
                   ),
                 ],

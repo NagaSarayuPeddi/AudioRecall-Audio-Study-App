@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:assisted_learning/study_set.dart';
+import 'package:assisted_learning/sets_screen.dart';
 import 'package:assisted_learning/flash_card.dart';
 import 'app_config.dart';
 
@@ -110,6 +110,7 @@ class AIService {
       name: formattedTopic,
       description: 'AI generated — $formattedTopic',
       flashCards: flashCards,
+      isEditing: false,
     );
   }
 }

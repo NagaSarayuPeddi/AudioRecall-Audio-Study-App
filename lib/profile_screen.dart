@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'flash_card.dart';
-import 'study_set.dart';
-import 'study_session.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'services/tts_service.dart';
 
-String userName = "";
+String userName = '';
 
 class ProfileScreen extends StatefulWidget {
   final Function(String) onNameChanged;
-
   const ProfileScreen({super.key, required this.onNameChanged});
 
   @override
@@ -16,13 +13,13 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  TextEditingController nameController = TextEditingController();
+  @override
   void initState() {
     super.initState();
-    loadVoices();
+    _loadVoices();
   }
 
-  Future<void> loadVoices() async {
+  Future<void> _loadVoices() async {
     await TTSSettings.loadVoices();
     if (TTSSettings.voices.isNotEmpty) {
       TTSSettings.selectedVoice = TTSSettings.voices.first;
@@ -34,91 +31,225 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF364B9A),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF364B9A), // navy
-        foregroundColor: Colors.white, // white text
-        title: Text("Settings"),
+        backgroundColor: const Color(0xFF364B9A),
+        foregroundColor: Colors.white,
+        title: const Text('Settings'),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          SizedBox(height: 20),
-          Text(
-            "Voice",
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            width: 250,
-            child: DropdownButton<Map<String, String>>(
-              isExpanded: true,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-              dropdownColor: const Color(0xFF364B9A), // navy dropdown
-              hint: Text(
-                "Select Voice",
-                style: TextStyle(color: const Color(0xFFFDB366)), // orange
-              ),
-              //   hint: Text(
-              //      "Select Voice",
-              //     //style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              //    ),
-              value: TTSSettings.selectedVoice,
-              items: TTSSettings.voices.map((voice) {
-                //final v = Map<String, String>.from(voice);
-                return DropdownMenuItem(
-                  value: voice,
-                  child: Text(
-                    voice['name'] ?? 'Unknown',
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.normal,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Voice section ──────────────────────────────────
+              _SectionLabel('Voice'),
+              const SizedBox(height: 8),
+              _SettingsCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Speaker voice',
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        color: Colors.white60,
+                      ),
                     ),
-                  ),
-                );
-              }).toList(),
-              onChanged: (voice) async {
-                setState(() {
-                  TTSSettings.selectedVoice = voice;
-                });
+                    const SizedBox(height: 8),
+                    // full-width, fontSize 16 so names don't overflow
+                    DropdownButtonFormField<Map<String, String>>(
+                      isExpanded: true,
+                      decoration: InputDecoration(
+                        filled: true,
+                        // ignore: deprecated_member_use
+                        fillColor: Colors.white.withOpacity(0.08),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      dropdownColor: const Color(0xFF364B9A),
+                      style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        color: Colors.white,
+                      ),
+                      hint: Text(
+                        'Select a voice',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          color: Colors.white54,
+                        ),
+                      ),
+                      initialValue: TTSSettings.selectedVoice,
+                      items: TTSSettings.voices.map((voice) {
+                        return DropdownMenuItem(
+                          value: voice,
+                          child: Text(
+                            voice['name'] ?? 'Unknown',
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              color: Colors.white,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (voice) async {
+                        if (voice == null) return;
+                        setState(() => TTSSettings.selectedVoice = voice);
+                        await TTSSettings.tts.setVoice(voice);
+                        await TTSSettings.tts.speak(
+                          'Voice changed to ${voice['name']}',
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
 
-                await TTSSettings.tts.setVoice(voice!);
+              const SizedBox(height: 16),
 
-                await TTSSettings.tts.speak(
-                  "Voice changed to ${voice['name']}",
-                );
-              },
-            ),
+              // ── Speed section ──────────────────────────────────
+              _SectionLabel('Speed'),
+              const SizedBox(height: 8),
+              _SettingsCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Speech rate',
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            color: Colors.white60,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            // ignore: deprecated_member_use
+                            color: const Color(0xFFFDB366).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '${TTSSettings.speechRate.toStringAsFixed(1)}×',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFFFDB366),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    SliderTheme(
+                      data: SliderThemeData(
+                        activeTrackColor: const Color(0xFFFDB366),
+                        inactiveTrackColor: Colors.white24,
+                        thumbColor: const Color(0xFFFDB366),
+                        overlayColor:
+                            // ignore: deprecated_member_use
+                            const Color(0xFFFDB366).withOpacity(0.2),
+                        trackHeight: 4,
+                      ),
+                      child: Slider(
+                        value: TTSSettings.speechRate,
+                        min: 0.2,
+                        max: 2.0,
+                        divisions: 18,
+                        onChanged: (value) {
+                          TTSSettings.tts.stop();
+                          setState(() => TTSSettings.speechRate = value);
+                          TTSSettings.tts.setSpeechRate(value);
+                        },
+                        onChangeEnd: (value) async {
+                          await TTSSettings.tts.speak(
+                            'Speed set to ${value.toStringAsFixed(1)}',
+                          );
+                        },
+                      ),
+                    ),
+                    // Speed labels
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Slow',
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              color: Colors.white38,
+                            ),
+                          ),
+                          Text(
+                            'Fast',
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              color: Colors.white38,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          Text(
-            "Speed",
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-          ),
-          Slider(
-            activeColor: const Color(0xFFFDB366), // orange
-            inactiveColor: Colors.white24, // light contrast
-            value: TTSSettings.speechRate,
-            min: 0.2,
-            max: 2.0,
-            divisions: 8,
-            label: TTSSettings.speechRate.toStringAsFixed(2),
-            onChanged: (value) {
-              TTSSettings.tts.stop();
-              setState(() {
-                TTSSettings.speechRate = value;
-              });
-              TTSSettings.tts.setSpeechRate(TTSSettings.speechRate);
-
-              TTSSettings.tts.speak(
-                "Speech rate set to ${value.toStringAsFixed(2)}",
-              );
-            },
-          ),
-        ],
+        ),
       ),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  final String text;
+  const _SectionLabel(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text.toUpperCase(),
+      style: GoogleFonts.poppins(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: Colors.white54,
+        letterSpacing: 0.8,
+      ),
+    );
+  }
+}
+
+class _SettingsCard extends StatelessWidget {
+  final Widget child;
+  const _SettingsCard({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        // ignore: deprecated_member_use
+        color: Colors.white.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white12),
+      ),
+      child: child,
     );
   }
 }

@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:assisted_learning/models/card_progress.dart';
 import 'package:assisted_learning/services/progress_service.dart';
 import 'package:assisted_learning/services/tts_service.dart';
-import 'package:assisted_learning/study_set.dart';
+import 'package:assisted_learning/sets_screen.dart';
 
 class ProgressScreen extends StatefulWidget {
   final StudySet set;
@@ -75,7 +75,21 @@ class _ProgressScreenState extends State<ProgressScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF364B9A),
         foregroundColor: Colors.white,
-        title: Text('Progress — ${widget.set.name}'),
+        //title: Text('Progress — ${widget.set.name}'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'Progress',
+              style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+              overflow: TextOverflow.ellipsis,
+            ),
+            Text(
+              widget.set.name,
+              style: const TextStyle(fontSize: 18, color: Colors.white60),
+            ),
+          ],
+        ),
         centerTitle: true,
         actions: [
           // Read summary aloud button
@@ -121,7 +135,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
           children: [
             ExcludeSemantics(
               child: Text(
-                '${widget.set.name}',
+                widget.set.name,
                 style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -264,7 +278,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
               selectedColor: const Color(0xFFFDB366),
               backgroundColor: Colors.white24,
               labelStyle: GoogleFonts.poppins(
-                color: selected ? const Color(0xFF364B9A) : Colors.white,
+                color: const Color(0xFF364B9A),
                 fontWeight: selected ? FontWeight.bold : FontWeight.normal,
               ),
             ),

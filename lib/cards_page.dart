@@ -2,24 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'flash_card.dart';
 import 'profile_screen.dart';
-import 'study_set.dart';
+//import 'widgets/study_set.dart';
+import 'sets_screen.dart';
 import 'study_session.dart';
-import 'main.dart';
 import 'progress_screen.dart';
 
-// class CardPage {
-//   final String id;
-//   final String question;
-//   final String answer;
-
-//   CardPage({required this.id, required this.question, required this.answer});
-// }
-
 class CardPage extends StatefulWidget {
-  // String setName = '';
-  // String setId = '';
   final StudySet cardSet;
-
   const CardPage({super.key, required this.cardSet});
 
   @override
@@ -27,225 +16,223 @@ class CardPage extends StatefulWidget {
 }
 
 class CardPageState extends State<CardPage> {
-  // int numerOfCards = 0;
-  // List<FlashCard> flashCards = [];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF364B9A), // navy background
-      // appBar: AppBar(title: Text(widget.cardSet.name), centerTitle: true),
+      backgroundColor: const Color(0xFF364B9A),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF364B9A), // navy
-        foregroundColor: Colors.white, // white text
-        title: Text(widget.cardSet.name),
-        centerTitle: true,
+        backgroundColor: const Color(0xFF364B9A),
+        foregroundColor: Colors.white,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.cardSet.name,
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+              overflow: TextOverflow.ellipsis,
+            ),
+            Text(
+              '${widget.cardSet.flashCards.length} cards',
+              style: const TextStyle(fontSize: 12, color: Colors.white60),
+            ),
+          ],
+        ),
         actions: [
-          // progress button
-          Padding(
-            padding: const EdgeInsets.only(right: 4),
-            child: Semantics(
-              button: true,
-              label: 'View progress for this set',
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 15,
-                  ),
-                  backgroundColor: Colors.white,
-                  foregroundColor: const Color(0xFF364B9A),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
+          // Progress button
+          Semantics(
+            button: true,
+            label: 'View progress',
+            child: IconButton(
+              icon: const Icon(Icons.bar_chart_outlined),
+              tooltip: 'Progress',
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ProgressScreen(set: widget.cardSet),
                 ),
-                icon: const Icon(Icons.bar_chart, size: 24),
-                label: const Text(
-                  'Progress',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ProgressScreen(set: widget.cardSet),
-                    ),
-                  );
-                },
               ),
             ),
           ),
-          // settings button
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 15,
-                ),
-                backgroundColor: const Color(0xFFFDB366), // orange
-                foregroundColor: const Color(0xFF364B9A), // navy
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              icon: const Icon(Icons.settings, size: 24),
-              label: const Text(
-                "Settings",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              onPressed: () {
-                // Direct navigation to your settings/profile page
 
+          // Overflow menu for Settings (keeps AppBar clean)
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            tooltip: 'More options',
+            onSelected: (value) {
+              if (value == 'settings') {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProfileScreen(
-                      onNameChanged: (name) {},
-                    ), // <-- replace if your class is different
+                    builder: (_) => ProfileScreen(onNameChanged: (_) {}),
                   ),
                 );
-              },
-            ),
+              }
+            },
+            itemBuilder: (_) => [
+              const PopupMenuItem(
+                value: 'settings',
+                child: Row(
+                  children: [
+                    Icon(Icons.settings_outlined, size: 20),
+                    SizedBox(width: 12),
+                    Text('Settings'),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
       body: Column(
         children: [
-          //     IconButton(
-          //    icon: Icon(Icons.add),
-          //  alignment: Alignment.center,
-          //   onPressed: () {
-          //     setState(() {
-          //       widget.cardSet.flashCards.add(
-          //         FlashCard(
-          //            id: widget.cardSet.flashCards.length.toString(),
-          //            question: '',
-          //            answer: '',
-          //          ),
-          //        );
-          //      });
-          //    },
-          //   ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.add, color: Color(0xFFFDB366)),
-                iconSize: 30,
-                onPressed: () {
-                  setState(() {
-                    widget.cardSet.flashCards.add(
-                      FlashCard(
-                        id: widget.cardSet.flashCards.length.toString(),
-                        question: '',
-                        answer: '',
+          // ── Top action bar ─────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: Row(
+              children: [
+                // Start study session
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            StudySessionScreen(setToStudy: widget.cardSet),
                       ),
-                    );
-                  });
-                },
-              ),
-
-              const SizedBox(width: 8),
-
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    widget.cardSet.flashCards.add(
-                      FlashCard(
-                        id: widget.cardSet.flashCards.length.toString(),
-                        question: '',
-                        answer: '',
+                    ),
+                    icon: const Icon(Icons.headphones_outlined, size: 18),
+                    label: const Text('Study'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFDB366),
+                      foregroundColor: const Color(0xFF364B9A),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    );
-                  });
-                },
-                child: Text(
-                  "Add Card",
-                  style: GoogleFonts.poppins(
-                    textStyle: Theme.of(context).textTheme.titleMedium,
-                    color: const Color(0xFFFDB366),
-                    fontSize: 20,
+                      textStyle: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          //StudySession(setToStudy: widget.cardSet),
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      StudySessionScreen(setToStudy: widget.cardSet),
-                ),
-              );
-            },
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-              backgroundColor: const Color(0xFFFDB366), // orange
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Text(
-              "Go to Study Session",
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                color: const Color(0xFF364B9A),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: widget.cardSet.flashCards.length,
-              itemBuilder: (context, index) {
-                return FlashCardWidget(
-                  onDeleteCard: (flashCard) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext dialogContext) {
-                        return AlertDialog(
-                          content: const Text(
-                            'Are you sure you want to delete this flash card?',
-                            style: TextStyle(fontSize: 20, color: Colors.black),
-                            textAlign: TextAlign.center,
-                          ),
 
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(dialogContext);
-                              },
-                              child: const Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  widget.cardSet.flashCards.removeWhere(
-                                    (card) => card.id == flashCard.id,
-                                  );
-                                });
-                                Navigator.pop(dialogContext);
-                              },
-                              child: const Text(
-                                'Delete',
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            ),
-                          ],
+                const SizedBox(width: 10),
+
+                // Add card
+                Semantics(
+                  button: true,
+                  label: 'Add a new card',
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        widget.cardSet.flashCards.add(
+                          FlashCard(
+                            id: widget.cardSet.flashCards.length.toString(),
+                            question: '',
+                            answer: '',
+                          ),
                         );
-                      },
-                    );
-                  },
-                  flashCard: widget.cardSet.flashCards[index],
-                  key: ValueKey(widget.cardSet.flashCards[index].id),
-                );
-              },
+                      });
+                    },
+                    icon: const Icon(Icons.add, size: 18),
+                    label: const Text('Add card'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Colors.white38),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      textStyle: const TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ],
             ),
+          ),
+
+          const SizedBox(height: 4),
+
+          // ── Card list ──────────────────────────────────────
+          Expanded(
+            child: widget.cardSet.flashCards.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.style_outlined,
+                          size: 48,
+                          color: Colors.white24,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'No cards yet',
+                          style: GoogleFonts.poppins(
+                            fontSize: 18,
+                            color: Colors.white60,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Tap "Add card" to get started',
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            color: Colors.white38,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    itemCount: widget.cardSet.flashCards.length,
+                    itemBuilder: (context, index) {
+                      return FlashCardWidget(
+                        key: ValueKey(widget.cardSet.flashCards[index].id),
+                        flashCard: widget.cardSet.flashCards[index],
+                        onDeleteCard: (card) {
+                          showDialog(
+                            context: context,
+                            builder: (dialogContext) => AlertDialog(
+                              content: const Text(
+                                'Delete this card?',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(dialogContext),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      widget.cardSet.flashCards.removeWhere(
+                                        (c) => c.id == card.id,
+                                      );
+                                    });
+                                    Navigator.pop(dialogContext);
+                                  },
+                                  child: const Text(
+                                    'Delete',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
           ),
         ],
       ),
