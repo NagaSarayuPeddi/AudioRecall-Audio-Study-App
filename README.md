@@ -24,7 +24,7 @@ Accessibility settings.
 
 ## Audio-First Study Workflow
 
-1. EchoLearn asks the learner for a study topic.
+1. VocalSign asks the learner for a study topic.
 2. The learner answers using their voice.
 3. The app asks how many flashcards to generate.
 4. An AI service creates a customized study set.
