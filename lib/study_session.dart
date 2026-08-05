@@ -6,6 +6,7 @@ import 'services/semantics_announcer.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'services/answer_matcher.dart';
+import 'services/progress_service.dart';
 
 class StudySessionScreen extends StatefulWidget {
   final StudySet setToStudy;
@@ -127,7 +128,13 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
 
         if (yesOrNo.contains('yes') || yesOrNo.contains('sure')) {
           await readQuestion();
-          if (attempts == 1) wrongAnswers++;
+          if (attempts == 1) {
+            wrongAnswers++;
+            await ProgressService.recordWrong(
+              widget.setToStudy,
+              widget.setToStudy.flashCards[currentQuestionIndex],
+            );
+          }
           setState(() => currentQuestionIndex++);
           num++;
           await Future.delayed(const Duration(milliseconds: 500));
@@ -177,6 +184,12 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
         bgdColor = Colors.green;
         if (attempts == 1) correctAnswers++;
       });
+      if (attempts == 1) {
+        await ProgressService.recordCorrect(
+          widget.setToStudy,
+          widget.setToStudy.flashCards[currentQuestionIndex],
+        );
+      }
 
       // Give slightly different feedback depending on how close it was
       if (result.score == 1.0) {
@@ -219,6 +232,12 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
         bgdColor = Colors.red;
         if (attempts == 1) wrongAnswers++;
       });
+      if (attempts == 1) {
+        await ProgressService.recordWrong(
+          widget.setToStudy,
+          widget.setToStudy.flashCards[currentQuestionIndex],
+        );
+      }
 
       SemanticsAnnouncer.announce('Incorrect. Try again.', assertive: true);
       await TTSSettings.tts.speak('Try again!');

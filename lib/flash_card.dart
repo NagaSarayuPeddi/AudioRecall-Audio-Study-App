@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:study_app/services/tts_service.dart';
+import 'package:assisted_learning/services/tts_service.dart';
 import 'services/stt_service.dart';
 import 'widgets/accessible_mic_button.dart';
 import 'package:flutter_tts/flutter_tts.dart';

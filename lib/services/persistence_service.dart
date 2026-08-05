@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:study_app/study_set.dart';
-import 'package:study_app/flash_card.dart';
+import 'package:assisted_learning/study_set.dart';
+import 'package:assisted_learning/flash_card.dart';
 
 /// Handles saving and loading all user-created study sets.
 ///

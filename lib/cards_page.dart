@@ -5,6 +5,7 @@ import 'profile_screen.dart';
 import 'study_set.dart';
 import 'study_session.dart';
 import 'main.dart';
+import 'progress_screen.dart';
 
 // class CardPage {
 //   final String id;
@@ -40,6 +41,41 @@ class CardPageState extends State<CardPage> {
         title: Text(widget.cardSet.name),
         centerTitle: true,
         actions: [
+          // progress button
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: Semantics(
+              button: true,
+              label: 'View progress for this set',
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 15,
+                  ),
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF364B9A),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                icon: const Icon(Icons.bar_chart, size: 24),
+                label: const Text(
+                  'Progress',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ProgressScreen(set: widget.cardSet),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          // settings button
           Padding(
             padding: const EdgeInsets.only(right: 10),
             child: ElevatedButton.icon(
