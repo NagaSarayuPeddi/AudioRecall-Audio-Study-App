@@ -1,11 +1,7 @@
 /// Tracks a student's history with a single flash card.
 class CardProgress {
-  /// Matches FlashCard.id
   final String cardId;
-
-  /// Matches StudySet.id
   final String setId;
-
   final String question;
   final String answer;
 
@@ -27,28 +23,23 @@ class CardProgress {
 
   int get totalAttempts => correctCount + wrongCount;
 
-  /// 0.0 – 1.0
   double get accuracy =>
       totalAttempts == 0 ? 0.0 : correctCount / totalAttempts;
 
-  /// Mastery label shown to the student
+  /// Three tiers only — no "Learning" bucket
   String get masteryLabel {
     if (totalAttempts == 0) return 'Not studied';
-    if (accuracy >= 0.9 && correctCount >= 3) return 'Mastered';
+    if (accuracy >= 0.9 && correctCount >= 2) return 'Mastered';
     if (accuracy >= 0.7) return 'Familiar';
-    if (accuracy >= 0.4) return 'Learning';
     return 'Needs work';
   }
 
-  /// Emoji for quick visual scanning
   String get masteryEmoji {
     switch (masteryLabel) {
       case 'Mastered':
         return '⭐';
       case 'Familiar':
         return '✅';
-      case 'Learning':
-        return '📖';
       case 'Needs work':
         return '🔁';
       default:
@@ -56,8 +47,7 @@ class CardProgress {
     }
   }
 
-  /// Whether this card should be prioritised in a weak-cards drill
-  bool get needsPractice => totalAttempts > 0 && accuracy < 0.7;
+  bool get needsPractice => totalAttempts == 0 || accuracy < 0.7;
 
   // ─── Serialisation ───────────────────────────────────────────────────────
 

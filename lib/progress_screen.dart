@@ -7,7 +7,6 @@ import 'package:assisted_learning/sets_screen.dart';
 
 class ProgressScreen extends StatefulWidget {
   final StudySet set;
-
   const ProgressScreen({super.key, required this.set});
 
   @override
@@ -18,9 +17,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
   List<CardProgress> _progress = [];
   bool _isLoading = true;
   int _masteryPercent = 0;
-
-  // Which mastery filter is active — null means show all
-  String? _filter;
+  String? _filter; // null = show all
 
   @override
   void initState() {
@@ -39,19 +36,16 @@ class _ProgressScreenState extends State<ProgressScreen> {
     });
   }
 
-  List<CardProgress> get _filtered {
-    if (_filter == null) return _progress;
-    return _progress.where((p) => p.masteryLabel == _filter).toList();
-  }
+  List<CardProgress> get _filtered => _filter == null
+      ? _progress
+      : _progress.where((p) => p.masteryLabel == _filter).toList();
 
-  // Counts per mastery bucket
   int _count(String label) =>
       _progress.where((p) => p.masteryLabel == label).length;
 
   Future<void> _readSummaryAloud() async {
     final mastered = _count('Mastered');
     final familiar = _count('Familiar');
-    final learning = _count('Learning');
     final needsWork = _count('Needs work');
     final notStudied = _count('Not studied');
     final total = _progress.length;
@@ -62,7 +56,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
       'Out of $total cards: '
       '$mastered mastered, '
       '$familiar familiar, '
-      '$learning learning, '
       '$needsWork need work, '
       'and $notStudied not yet studied.',
     );
@@ -75,29 +68,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF364B9A),
         foregroundColor: Colors.white,
-        //title: Text('Progress — ${widget.set.name}'),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Progress',
-              style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              widget.set.name,
-              style: const TextStyle(fontSize: 18, color: Colors.white60),
-            ),
-          ],
-        ),
+        title: Text(widget.set.name, overflow: TextOverflow.ellipsis),
         centerTitle: true,
         actions: [
-          // Read summary aloud button
           Semantics(
             button: true,
             label: 'Read progress summary aloud',
             child: IconButton(
-              icon: const Icon(Icons.volume_up),
+              icon: const Icon(Icons.volume_up_outlined),
               tooltip: 'Read aloud',
               onPressed: _readSummaryAloud,
             ),
@@ -111,6 +89,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
           : Column(
               children: [
                 _buildSummaryHeader(),
+                const SizedBox(height: 8),
                 _buildFilterChips(),
                 const SizedBox(height: 8),
                 Expanded(child: _buildCardList()),
@@ -125,7 +104,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     return Semantics(
       label: '$_masteryPercent percent of ${widget.set.name} mastered',
       child: Container(
-        margin: const EdgeInsets.all(16),
+        margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -133,29 +112,17 @@ class _ProgressScreenState extends State<ProgressScreen> {
         ),
         child: Column(
           children: [
-            ExcludeSemantics(
-              child: Text(
-                widget.set.name,
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF364B9A),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Overall mastery ring
+            // Mastery ring
             ExcludeSemantics(
               child: Stack(
                 alignment: Alignment.center,
                 children: [
                   SizedBox(
-                    width: 100,
-                    height: 100,
+                    width: 90,
+                    height: 90,
                     child: CircularProgressIndicator(
                       value: _masteryPercent / 100,
-                      strokeWidth: 10,
+                      strokeWidth: 9,
                       backgroundColor: Colors.grey.shade200,
                       color: _masteryColor(_masteryPercent),
                     ),
@@ -163,7 +130,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   Text(
                     '$_masteryPercent%',
                     style: GoogleFonts.poppins(
-                      fontSize: 26,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF364B9A),
                     ),
@@ -172,37 +139,29 @@ class _ProgressScreenState extends State<ProgressScreen> {
               ),
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 6),
+            ExcludeSemantics(
+              child: Text(
+                'Mastered',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: Colors.grey.shade500,
+                ),
+              ),
+            ),
 
-            // Bucket counts row
+            const SizedBox(height: 16),
+
+            // Three bucket row
             ExcludeSemantics(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _bucketBadge(
-                    '⭐',
-                    'Mastered',
-                    _count('Mastered'),
-                    Colors.amber,
-                  ),
-                  _bucketBadge(
-                    '✅',
-                    'Familiar',
-                    _count('Familiar'),
-                    Colors.green,
-                  ),
-                  _bucketBadge(
-                    '📖',
-                    'Learning',
-                    _count('Learning'),
-                    Colors.blue,
-                  ),
-                  _bucketBadge(
-                    '🔁',
-                    'Needs work',
-                    _count('Needs work'),
-                    Colors.red,
-                  ),
+                  _bucket('⭐', 'Mastered', _count('Mastered'), Colors.amber),
+                  _divider(),
+                  _bucket('✅', 'Familiar', _count('Familiar'), Colors.green),
+                  _divider(),
+                  _bucket('🔁', 'Needs work', _count('Needs work'), Colors.red),
                 ],
               ),
             ),
@@ -212,21 +171,25 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _bucketBadge(String emoji, String label, int count, Color color) {
+  Widget _divider() =>
+      Container(height: 36, width: 1, color: Colors.grey.shade200);
+
+  Widget _bucket(String emoji, String label, int count, Color color) {
     return Column(
       children: [
-        Text(emoji, style: const TextStyle(fontSize: 20)),
+        Text(emoji, style: const TextStyle(fontSize: 22)),
+        const SizedBox(height: 4),
         Text(
           '$count',
           style: GoogleFonts.poppins(
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
             color: color,
           ),
         ),
         Text(
           label,
-          style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey),
+          style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey.shade500),
         ),
       ],
     );
@@ -241,10 +204,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
   // ─── Filter chips ─────────────────────────────────────────────────────────
 
   Widget _buildFilterChips() {
-    const filters = [
+    // Three tiers + all + not studied
+    const filters = <String?>[
       null,
       'Needs work',
-      'Learning',
       'Familiar',
       'Mastered',
       'Not studied',
@@ -252,14 +215,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
     const labels = [
       'All',
       '🔁 Needs work',
-      '📖 Learning',
       '✅ Familiar',
       '⭐ Mastered',
       '⬜ Not studied',
     ];
 
     return SizedBox(
-      height: 44,
+      height: 40,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -272,15 +234,19 @@ class _ProgressScreenState extends State<ProgressScreen> {
             selected: selected,
             label: 'Filter by ${labels[i]}',
             child: FilterChip(
-              label: Text(labels[i]),
+              label: Text(
+                labels[i],
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: selected ? const Color(0xFF364B9A) : Colors.white,
+                  fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
               selected: selected,
               onSelected: (_) => setState(() => _filter = filters[i]),
               selectedColor: const Color(0xFFFDB366),
-              backgroundColor: Colors.white24,
-              labelStyle: GoogleFonts.poppins(
-                color: const Color(0xFF364B9A),
-                fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-              ),
+              backgroundColor: Colors.white12,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
             ),
           );
         },
@@ -292,49 +258,43 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
   Widget _buildCardList() {
     final cards = _filtered;
-
     if (cards.isEmpty) {
       return Center(
         child: Text(
           'No cards in this category.',
-          style: GoogleFonts.poppins(color: Colors.white70, fontSize: 16),
+          style: GoogleFonts.poppins(color: Colors.white54, fontSize: 15),
         ),
       );
     }
-
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
       itemCount: cards.length,
-      itemBuilder: (context, index) => _buildCardTile(cards[index]),
+      itemBuilder: (_, i) => _cardTile(cards[i]),
     );
   }
 
-  Widget _buildCardTile(CardProgress p) {
-    final accuracyPercent = (p.accuracy * 100).round();
-
+  Widget _cardTile(CardProgress p) {
+    final pct = (p.accuracy * 100).round();
     return Semantics(
       label:
           '${p.question}: ${p.masteryLabel}. '
-          '$accuracyPercent percent accuracy. '
+          '$pct percent accuracy. '
           '${p.correctCount} correct, ${p.wrongCount} wrong.',
       child: Card(
         color: Colors.white,
-        margin: const EdgeInsets.only(bottom: 10),
+        margin: const EdgeInsets.only(bottom: 8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              // Mastery emoji
               ExcludeSemantics(
                 child: Text(
                   p.masteryEmoji,
-                  style: const TextStyle(fontSize: 28),
+                  style: const TextStyle(fontSize: 24),
                 ),
               ),
               const SizedBox(width: 12),
-
-              // Word + accuracy bar
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,7 +303,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       child: Text(
                         p.question,
                         style: GoogleFonts.poppins(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: const Color(0xFF364B9A),
                         ),
@@ -355,7 +315,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         p.answer,
                         style: GoogleFonts.poppins(
                           fontSize: 12,
-                          color: Colors.grey.shade600,
+                          color: Colors.grey.shade500,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -367,7 +327,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         borderRadius: BorderRadius.circular(4),
                         child: LinearProgressIndicator(
                           value: p.accuracy,
-                          minHeight: 6,
+                          minHeight: 5,
                           backgroundColor: Colors.grey.shade200,
                           color: _accuracyColor(p.accuracy),
                         ),
@@ -376,18 +336,15 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(width: 12),
-
-              // Stats column
               ExcludeSemantics(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '$accuracyPercent%',
+                      '$pct%',
                       style: GoogleFonts.poppins(
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: _accuracyColor(p.accuracy),
                       ),
@@ -396,7 +353,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       '${p.correctCount}✓ ${p.wrongCount}✗',
                       style: GoogleFonts.poppins(
                         fontSize: 11,
-                        color: Colors.grey.shade500,
+                        color: Colors.grey.shade400,
                       ),
                     ),
                     if (p.lastStudied != null)
@@ -424,8 +381,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final diff = now.difference(date);
+    final diff = DateTime.now().difference(date);
     if (diff.inDays == 0) return 'Today';
     if (diff.inDays == 1) return 'Yesterday';
     if (diff.inDays < 7) return '${diff.inDays}d ago';

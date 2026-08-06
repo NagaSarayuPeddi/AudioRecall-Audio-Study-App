@@ -213,17 +213,22 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   Future<void> endSession() async {
     TTSSettings.tts.stop();
     await STTService().stopListening();
+
     if (tapCompleter != null && !tapCompleter!.isCompleted) {
       tapCompleter!.complete('cancel');
     }
-    if (mounted) {
-      _showSummaryDialog();
-      await _speakSummary();
-    }
+
     setState(() {
       isSessionActive = false;
       _cardAccentColor = const Color(0xFFFDB366);
     });
+
+    if (mounted) {
+      // Show dialog first so student sees the result
+      _showSummaryDialog();
+      // Then speak it
+      await _speakSummary();
+    }
   }
 
   Future<void> _readQuestion() async {
@@ -240,40 +245,174 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
   }
 
   Future<void> _speakSummary() async {
-    await TTSSettings.tts.speak('Do you want to hear your session summary?');
-    await Future.delayed(const Duration(milliseconds: 500));
-    final response = await STTService().listenOnce();
-    if (response.contains('yes') || response.contains('sure')) {
-      final total = correctAnswers + wrongAnswers;
-      await TTSSettings.tts.speak(
-        'You got $correctAnswers correct and $wrongAnswers wrong '
-        'out of $total flashcards.',
-      );
-    } else {
-      await TTSSettings.tts.speak('Okay. Bye!');
-    }
+    final total = _totalAttempted;
+    final pct = _percentCorrect;
+
+    // Always speak the score — don't ask first
+    await TTSSettings.tts.speak(
+      'Session complete! '
+      'You scored $pct percent. '
+      '$correctAnswers correct out of $total cards.',
+    );
+  }
+
+  int get _totalAttempted => correctAnswers + wrongAnswers;
+
+  int get _percentCorrect {
+    if (_totalAttempted == 0) return 0;
+    return ((correctAnswers / _totalAttempted) * 100).round();
   }
 
   void _showSummaryDialog() {
     if (!mounted) return;
+
+    final total = _totalAttempted;
+    final pct = _percentCorrect;
+
+    // Pick an emoji based on score
+    final String medal;
+    if (pct >= 90)
+      medal = '🏆';
+    else if (pct >= 70)
+      medal = '⭐';
+    else if (pct >= 50)
+      medal = '📖';
+    else
+      medal = '🔁';
+
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (_) => AlertDialog(
-        title: const Text('Session summary'),
-        content: Text(
-          'Correct: $correctAnswers\n'
-          'Wrong: $wrongAnswers\n'
-          'Total: ${correctAnswers + wrongAnswers}',
-          style: const TextStyle(fontSize: 18, color: Colors.black),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Semantics(
+          header: true,
+          child: Column(
+            children: [
+              Text(
+                medal,
+                style: const TextStyle(fontSize: 40),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Session complete',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ),
+        content: Semantics(
+          label:
+              '$pct percent correct. '
+              '$correctAnswers correct out of $total cards.',
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Big percentage
+              Text(
+                '$pct%',
+                style: TextStyle(
+                  fontSize: 52,
+                  fontWeight: FontWeight.bold,
+                  color: _pctColor(pct),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                'correct',
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Progress bar
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: LinearProgressIndicator(
+                  value: total == 0 ? 0 : correctAnswers / total,
+                  minHeight: 8,
+                  backgroundColor: Colors.grey.shade200,
+                  color: _pctColor(pct),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Stats row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _statChip(
+                    '${correctAnswers}',
+                    'Correct',
+                    Colors.green,
+                    Icons.check_circle_outline,
+                  ),
+                  _statChip(
+                    '${wrongAnswers}',
+                    'Wrong',
+                    Colors.red,
+                    Icons.cancel_outlined,
+                  ),
+                  _statChip(
+                    '$total',
+                    'Total',
+                    Colors.grey.shade600,
+                    Icons.style_outlined,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF364B9A),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text('Done'),
+            ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _statChip(String value, String label, Color color, IconData icon) {
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 20),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+        ),
+      ],
+    );
+  }
+
+  Color _pctColor(int pct) {
+    if (pct >= 70) return Colors.green;
+    if (pct >= 40) return const Color(0xFFFDB366);
+    return Colors.red;
   }
 
   @override
