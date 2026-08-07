@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-//import 'package:assisted_learning/widgets/study_set.dart';
-import 'package:assisted_learning/sets_screen.dart';
-import 'package:assisted_learning/flash_card.dart';
+//import 'package:AudioRecall/widgets/study_set.dart';
+import 'package:AudioRecall/sets_screen.dart';
+import 'package:AudioRecall/flash_card.dart';
 
 /// Handles saving and loading all user-created study sets.
 ///
@@ -11,7 +11,7 @@ import 'package:assisted_learning/flash_card.dart';
 /// serialisation package is required.
 class PersistenceService {
   PersistenceService._();
-  static const String _setsKey = 'echolearn_study_sets';
+  static const String _setsKey = 'audiorecall_study_sets';
 
   // ─── Public API ────────────────────────────────────────────
 

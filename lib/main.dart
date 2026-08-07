@@ -1,5 +1,5 @@
-import 'package:assisted_learning/home_screen.dart';
-import 'package:assisted_learning/sets_screen.dart';
+import 'package:AudioRecall/home_screen.dart';
+import 'package:AudioRecall/sets_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'EchoLearn',
+      title: 'AudioRecall',
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFF364B9A),
         colorScheme: ColorScheme.fromSeed(

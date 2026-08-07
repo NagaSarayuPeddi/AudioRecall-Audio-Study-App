@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:assisted_learning/models/card_progress.dart';
-import 'package:assisted_learning/flash_card.dart';
-import 'package:assisted_learning/sets_screen.dart';
+import 'package:AudioRecall/models/card_progress.dart';
+import 'package:AudioRecall/flash_card.dart';
+import 'package:AudioRecall/sets_screen.dart';
 
 /// Persists per-card study statistics across sessions.
 ///

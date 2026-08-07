@@ -19,7 +19,7 @@ class InstructionScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFF364B9A),
         foregroundColor: Colors.white,
-        title: const Text('About EchoLearn'),
+        title: const Text('About AudioRecall'),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -219,8 +219,8 @@ class InstructionScreen extends StatelessWidget {
 
   Future<void> _readPageAloud() async {
     await TTSSettings.tts.speak(
-      'Welcome to EchoLearn. '
-      'EchoLearn is an audio-first flashcard app designed for students '
+      'Welcome to AudioRecall. '
+      'AudioRecall is an audio-first flashcard app designed for students '
       'with visual impairments. '
       'Here is how to use it. '
       'Step 1: Add a study set. Go to the Home tab and import a CSV '
@@ -256,7 +256,7 @@ class _HeroCard extends StatelessWidget {
           const Icon(Icons.headphones, size: 44, color: Color(0xFF364B9A)),
           const SizedBox(height: 12),
           Text(
-            'EchoLearn',
+            'AudioRecall',
             style: GoogleFonts.poppins(
               fontSize: 26,
               fontWeight: FontWeight.bold,
@@ -496,7 +496,7 @@ class _AboutCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'EchoLearn was built to make studying accessible for '
+            'AudioRecall was built to make studying accessible for '
             'students with visual impairments. It uses speech recognition '
             'and text-to-speech so the entire study flow — creating sets, '
             'studying cards, and reviewing progress — can be done '

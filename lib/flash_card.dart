@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:assisted_learning/services/tts_service.dart';
-import 'package:assisted_learning/services/stt_service.dart';
-import 'package:assisted_learning/widgets/accessible_mic_button.dart';
+import 'package:AudioRecall/services/tts_service.dart';
+import 'package:AudioRecall/services/stt_service.dart';
+import 'package:AudioRecall/widgets/accessible_mic_button.dart';
 
 class FlashCard {
   final String id;

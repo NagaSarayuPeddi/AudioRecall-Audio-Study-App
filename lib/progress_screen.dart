@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:assisted_learning/models/card_progress.dart';
-import 'package:assisted_learning/services/progress_service.dart';
-import 'package:assisted_learning/services/tts_service.dart';
-import 'package:assisted_learning/sets_screen.dart';
+import 'package:AudioRecall/models/card_progress.dart';
+import 'package:AudioRecall/services/progress_service.dart';
+import 'package:AudioRecall/services/tts_service.dart';
+import 'package:AudioRecall/sets_screen.dart';
 
 class ProgressScreen extends StatefulWidget {
   final StudySet set;
@@ -238,7 +238,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 labels[i],
                 style: GoogleFonts.poppins(
                   fontSize: 13,
-                  color: selected ? const Color(0xFF364B9A) : Colors.white,
+                  color: const Color(0xFF364B9A),
                   fontWeight: selected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),

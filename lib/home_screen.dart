@@ -44,7 +44,7 @@ class HomeScreen extends StatelessWidget {
 
               // ── Welcome ───────────────────────────────────────
               Text(
-                'Welcome to EchoLearn',
+                'Welcome to AudioRecall',
                 style: GoogleFonts.poppins(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:assisted_learning/sets_screen.dart';
-import 'package:assisted_learning/flash_card.dart';
+import 'package:AudioRecall/sets_screen.dart';
+import 'package:AudioRecall/flash_card.dart';
 import 'app_config.dart';
 
 class AIService {
