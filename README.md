@@ -1,6 +1,6 @@
-# AssistedLearning : AI Study Companion
+# AudioRecall : AI Study Companion
 
-Assistedlearning is an audio-first study application built with Flutter to make
+AudioRecall is an audio-first study application built with Flutter to make
 flashcard-based learning more accessible for students who benefit from
 voice-guided interaction, including students with visual impairments.
 
@@ -24,11 +24,11 @@ Accessibility settings.
 
 ## Audio-First Study Workflow
 
-1. AssistedLearning asks the learner for a study topic.
+1. AudioRecall asks the learner for a study topic.
 2. The learner answers using their voice.
 3. The app asks how many flashcards to generate.
 4. An AI service creates a customized study set.
-5. AssistedLearning reads confirmation and study content aloud.
+5. AudioRecall reads confirmation and study content aloud.
 6. The study set is saved locally for future sessions.
 
 ## Features
