@@ -13,16 +13,16 @@ Users can create study sets using voice commands, generate flashcards with AI, i
   </tr>
   <tr>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/93de2ee1-2e9c-4d01-b10b-d22b5dd9551a" width="180" alt="Home Screen"/>
+      <img src="https://github.com/user-attachments/assets/93de2ee1-2e9c-4d01-b10b-d22b5dd9551a" width="240" alt="Home Screen"/>
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/764c9e61-0d40-48fa-a388-0bd6c88e7895" width="180" alt="Study Sets Screen"/>
+      <img src="https://github.com/user-attachments/assets/764c9e61-0d40-48fa-a388-0bd6c88e7895" width="240" alt="Study Sets Screen"/>
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/f3d94e48-2d54-4c81-be5d-212e2d6b3960" width="180" alt="Flashcards Screen"/>
+      <img src="https://github.com/user-attachments/assets/f3d94e48-2d54-4c81-be5d-212e2d6b3960" width="240" alt="Flashcards Screen"/>
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/0d89eb33-57be-4b2d-96ce-25ef8d046844" width="180" alt="Study Session Screen"/>
+      <img src="https://github.com/user-attachments/assets/0d89eb33-57be-4b2d-96ce-25ef8d046844" width="240" alt="Study Session Screen"/>
     </td>
   </tr>
   <tr>
@@ -33,13 +33,13 @@ Users can create study sets using voice commands, generate flashcards with AI, i
   </tr>
   <tr>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/645306fb-4c2d-4b9e-b7c9-1bf65ffc0afb" width="180" alt="Progress Screen"/>
+      <img src="https://github.com/user-attachments/assets/645306fb-4c2d-4b9e-b7c9-1bf65ffc0afb" width="240" alt="Progress Screen"/>
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/b5b1ba2e-6128-4b8c-a646-823afadb7fdd" width="180" alt="Accessibility Settings Screen"/>
+      <img src="https://github.com/user-attachments/assets/b5b1ba2e-6128-4b8c-a646-823afadb7fdd" width="240" alt="Accessibility Settings Screen"/>
     </td>
     <td align="center">
-      <img src="https://github.com/user-attachments/assets/c634c04e-078a-4125-9535-f65fe63cda89" width="180" alt="Information Screen"/>
+      <img src="https://github.com/user-attachments/assets/c634c04e-078a-4125-9535-f65fe63cda89" width="240" alt="Information Screen"/>
     </td>
     <td></td>
   </tr>
