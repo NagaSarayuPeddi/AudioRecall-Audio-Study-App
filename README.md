@@ -5,7 +5,7 @@ AudioRecall is an audio-first study application built with Flutter to make flash
 Users can create study sets using voice commands, generate flashcards with AI, import CSV study materials, listen to questions and answers through text-to-speech, and save study sets for future use.
 
 ### Home Screen
-<img width="491" height="611" alt="Screenshot 2026-08-31 at 7 23 52 AM" src="https://github.com/user-attachments/assets/729d0bce-116d-4319-90c0-09e59e5972f7" />
+<img width="327" height="666" alt="Screenshot 2026-10-31 at 5 13 35 PM" src="https://github.com/user-attachments/assets/93de2ee1-2e9c-4d01-b10b-d22b5dd9551a" />
 
 ### Study Sets Screen
 <img width="495" height="608" alt="Screenshot 2026-08-31 at 7 24 17 AM" src="https://github.com/user-attachments/assets/c5e4b085-c784-42ae-8cbb-f6106ca533db" />
