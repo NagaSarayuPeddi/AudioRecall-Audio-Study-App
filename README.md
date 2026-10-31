@@ -4,26 +4,52 @@ AudioRecall is an audio-first study application built with Flutter to make flash
 
 Users can create study sets using voice commands, generate flashcards with AI, import CSV study materials, listen to questions and answers through text-to-speech, and save study sets for future use.
 
-### Home Screen
-<img width="327" height="666" alt="Screenshot 2026-10-31 at 5 13 35 PM" src="https://github.com/user-attachments/assets/93de2ee1-2e9c-4d01-b10b-d22b5dd9551a" />
-
-### Study Sets Screen
-<img width="495" height="608" alt="Screenshot 2026-08-31 at 7 24 17 AM" src="https://github.com/user-attachments/assets/c5e4b085-c784-42ae-8cbb-f6106ca533db" />
-
-### Flashcards Screen
-<img width="495" height="612" alt="Screenshot 2026-08-31 at 7 24 39 AM" src="https://github.com/user-attachments/assets/809e42a4-5c06-403a-b327-3ff85c636af6" />
-
-### Study Session Screen
-<img width="492" height="608" alt="Screenshot 2026-08-31 at 7 24 55 AM" src="https://github.com/user-attachments/assets/3cf429c7-43c6-4ab3-a81c-be2fc1dffbd7" />
-
-### Progress Screen
-<img width="493" height="610" alt="Screenshot 2026-08-31 at 7 25 18 AM" src="https://github.com/user-attachments/assets/994c196d-9f0e-428c-9c5a-f5437e72202a" />
-
-### Accessibility Settings Screen
-<img width="494" height="610" alt="Screenshot 2026-08-31 at 7 25 38 AM" src="https://github.com/user-attachments/assets/c0e030f9-2e33-4b92-b7f1-cc415ea4a2a3" />
-
-### Information Screen
-<img width="493" height="611" alt="Screenshot 2026-08-31 at 7 25 50 AM" src="https://github.com/user-attachments/assets/b9e651e1-585f-447e-ab4a-2fe9f536341c" />\
+<table>
+  <tr>
+    <td align="center"><b>Home Screen</b></td>
+    <td align="center"><b>Study Sets Screen</b></td>
+    <td align="center"><b>Flashcards Screen</b></td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/93de2ee1-2e9c-4d01-b10b-d22b5dd9551a" width="220" alt="Home Screen"/>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/764c9e61-0d40-48fa-a388-0bd6c88e7895" width="220" alt="Study Sets Screen"/>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/f3d94e48-2d54-4c81-be5d-212e2d6b3960" width="220" alt="Flashcards Screen"/>
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><b>Study Session Screen</b></td>
+    <td align="center"><b>Progress Screen</b></td>
+    <td align="center"><b>Accessibility Settings Screen</b></td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/0d89eb33-57be-4b2d-96ce-25ef8d046844" width="220" alt="Study Session Screen"/>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/645306fb-4c2d-4b9e-b7c9-1bf65ffc0afb" width="220" alt="Progress Screen"/>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/b5b1ba2e-6128-4b8c-a646-823afadb7fdd" width="220" alt="Accessibility Settings Screen"/>
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><b>Information Screen</b></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/c634c04e-078a-4125-9535-f65fe63cda89" width="220" alt="Information Screen"/>
+    </td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
 
 ## Audio-First Study Workflow
 
