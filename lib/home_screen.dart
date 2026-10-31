@@ -34,8 +34,8 @@ class HomeScreen extends StatelessWidget {
 
               // ── Logo ──────────────────────────────────────────
               Image.asset(
-                'assets/images/echolearn.png',
-                width: 120,
+                'assets/images/audiorecall.png',
+                width: 300,
                 height: 120,
                 fit: BoxFit.contain,
               ),
@@ -63,7 +63,7 @@ class HomeScreen extends StatelessWidget {
 
               // ── New user button ───────────────────────────────
               _OutlineButton(
-                label: "I'm new — show me around",
+                label: "I'm new - Show me around",
                 icon: Icons.help_outline,
                 onTap: () {
                   final navBarState = context
