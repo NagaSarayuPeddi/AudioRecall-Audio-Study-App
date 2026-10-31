@@ -9,7 +9,6 @@ Users can create study sets using voice commands, generate flashcards with AI, i
     <td align="center"><b>Home Screen</b></td>
     <td align="center"><b>Study Sets Screen</b></td>
     <td align="center"><b>Flashcards Screen</b></td>
-    <td align="center"><b>Study Session Screen</b></td>
   </tr>
   <tr>
     <td align="center">
@@ -21,26 +20,33 @@ Users can create study sets using voice commands, generate flashcards with AI, i
     <td align="center">
       <img src="https://github.com/user-attachments/assets/f3d94e48-2d54-4c81-be5d-212e2d6b3960" width="240" alt="Flashcards Screen"/>
     </td>
+  </tr>
+  <tr>
+    <td align="center"><b>Study Session Screen</b></td>
+    <td align="center"><b>Progress Screen</b></td>
+    <td align="center"><b>Accessibility Settings Screen</b></td>
+  </tr>
+  <tr>
     <td align="center">
       <img src="https://github.com/user-attachments/assets/0d89eb33-57be-4b2d-96ce-25ef8d046844" width="240" alt="Study Session Screen"/>
     </td>
-  </tr>
-  <tr>
-    <td align="center"><b>Progress Screen</b></td>
-    <td align="center"><b>Accessibility Settings</b></td>
-    <td align="center"><b>Information Screen</b></td>
-    <td></td>
-  </tr>
-  <tr>
     <td align="center">
       <img src="https://github.com/user-attachments/assets/645306fb-4c2d-4b9e-b7c9-1bf65ffc0afb" width="240" alt="Progress Screen"/>
     </td>
     <td align="center">
       <img src="https://github.com/user-attachments/assets/b5b1ba2e-6128-4b8c-a646-823afadb7fdd" width="240" alt="Accessibility Settings Screen"/>
     </td>
+  </tr>
+  <tr>
+    <td align="center"><b>Information Screen</b></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
     <td align="center">
       <img src="https://github.com/user-attachments/assets/c634c04e-078a-4125-9535-f65fe63cda89" width="240" alt="Information Screen"/>
     </td>
+    <td></td>
     <td></td>
   </tr>
 </table>
