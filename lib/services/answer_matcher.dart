@@ -198,7 +198,7 @@ class AnswerMatcher {
     return word;
   }
 
-  /// Standard Levenshtein edit distance.
+  /// Standard Levenshtein edit distance. Used AI to write standard algorithm.
   static int _levenshtein(String a, String b) {
     if (a == b) return 0;
     if (a.isEmpty) return b.length;
